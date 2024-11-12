@@ -1,0 +1,28 @@
+
+{% extends 'base.html' %}
+{% load static %}
+
+{% block contenido %}
+<body>
+        <div class="container mt-4">
+            <h2>Lista de Productos</h2>
+            <div class="row">
+                {% for producto in productos %}
+                <div class="col-md-4">
+                    <div class="card">
+                        <img src="{{ producto.imagen.url }}" class="card-img-top" alt="{{ producto.nombre_producto }}">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ producto.nombre_producto }}</h5>
+                            <p class="card-text">{{ producto.descripcion }}</p>
+                            <p class="card-text">Precio: ${{ producto.precio }}</p>
+                            <p class="card-text">Stock: {{ producto.stock }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</body>
+
+{% endblock %}
