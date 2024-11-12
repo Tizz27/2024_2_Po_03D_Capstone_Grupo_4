@@ -1,28 +1,124 @@
 
 {% extends 'base.html' %}
 {% load static %}
-
-{% block contenido %}
 <body>
-        <div class="container mt-4">
-            <h2>Lista de Productos</h2>
-            <div class="row">
-                {% for producto in productos %}
-                <div class="col-md-4">
-                    <div class="card">
-                        <img src="{{ producto.imagen.url }}" class="card-img-top" alt="{{ producto.nombre_producto }}">
-                        <div class="card-body">
-                            <h5 class="card-title">{{ producto.nombre_producto }}</h5>
-                            <p class="card-text">{{ producto.descripcion }}</p>
-                            <p class="card-text">Precio: ${{ producto.precio }}</p>
-                            <p class="card-text">Stock: {{ producto.stock }}</p>
+{% block contenido %}
+
+        <!-- Navbar principal -->
+        <nav class="navbar navbar-expand-lg navbar-custom">
+         <div class="container-fluid">
+             <a class="navbar-brand" href="#">
+                 <img src="{% static 'img/Logo.png' %}" alt="Logo" class="navbar-logo">
+             </a>
+             <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" 
+                     data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+                 <span class="navbar-toggler-icon"></span>
+             </button>
+             <!-- Menú principal (visible en pantallas grandes) -->
+             <div class="collapse navbar-collapse" id="navbarNav">
+                 <ul class="navbar-nav me-auto">
+                     <li class="nav-item">
+                         <a class="nav-link" href="#">Inicio</a>
+                     </li>
+                     <li class="nav-item">
+                         <a class="nav-link active" href="#">Productos</a>
+                     </li>
+                     <li class="nav-item">
+                         <a class="nav-link" href="#">Sobre Nosotros</a>
+                     </li>
+                     <li class="nav-item">
+                         <a class="nav-link" href="contacto.html">Contacto</a>
+                     </li>
+                 </ul>
+                 <form class="d-flex" role="search">
+                     <input class="form-control me-2" type="search" placeholder="Buscar" aria-label="Search">
+                     <button class="btn button" type="submit">Buscar</button>
+                 </form>
+             </div>
+         </div>
+     </nav>
+     
+     <!-- Sidebar (offcanvas) para móviles -->
+     <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+         <div class="offcanvas-header">
+             <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Menú</h5>
+             <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+         </div>
+         <div class="offcanvas-body">
+             <ul class="navbar-nav">
+                 <li class="nav-item">
+                     <a class="nav-link active" href="#">Inicio</a>
+                 </li>
+                 <li class="nav-item">
+                     <a class="nav-link" href="lista_productos.html">Productos</a>
+                 </li>
+                 <li class="nav-item">
+                     <a class="nav-link" href="contacto">Contacto</a>
+                 </li>
+                 <li class="nav-item">
+                     <a class="nav-link" href="/Login/">Iniciar Sesion</a>
+                 </li>
+             </ul>
+             <form class="d-flex mt-3">
+                 <input class="form-control" type="search" placeholder="Buscar" aria-label="Buscar">
+             </form>
+         </div>
+     </div>  
+         
+     <div class="container mt-4">
+        <div class="row">
+            <!-- Productos -->
+            <div class="col-md-8">
+                <h2>Productos</h2>
+                <div class="row">
+                    {% for producto in productos %}
+                    <div class="col-md-4">
+                        <div class="card">
+                            <img src="{{ producto.imagen.url }}" class="card-img-top" alt="{{ producto.nombre_producto }}">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ producto.nombre_producto }}</h5>
+                                <p class="card-text">{{ producto.descripcion }}</p>
+                                <p class="card-text">Precio: ${{ producto.precio }}</p>
+                                <p class="card-text">Stock: {{ producto.stock }}</p>
+                                <!-- Botón para agregar al carrito -->
+                                <form method="post" action="{% url 'agregar_al_carrito' producto.id_producto %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-primary">Agregar al Carrito</button>
+                                </form>
+                            </div>
                         </div>
                     </div>
+                    {% endfor %}
                 </div>
-                {% endfor %}
+            </div>
+
+            
+    
+            <!-- Carrito de compras -->
+            <div class="col-md-4">
+                <h2>Carrito de Compras</h2>
+                <ul class="list-group">
+                    {% if request.session.carrito %}
+                        {% for producto_id, item in request.session.carrito.items %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            {{ item.nombre }} ({{ item.cantidad }})
+                            <span>${{ item.precio|floatformat:2 }}</span>
+                            <!-- Botón para eliminar del carrito -->
+                            <a href="{% url 'eliminar_del_carrito' producto_id %}" class="btn btn-danger btn-sm">Eliminar</a>
+                        </li>
+                        {% endfor %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <strong>Total</strong>
+                            <strong>${{ total|floatformat:2 }}</strong>
+                        </li>
+                        <a href="{% url 'confirmar_pedido' %}" class="btn btn-success mt-3">Confirmar Pedido</a>
+                    {% else %}
+                        <li class="list-group-item">El carrito está vacío.</li>
+                    {% endif %}
+                </ul>
             </div>
         </div>
     </div>
-</body>
-
+    
 {% endblock %}
+</body>

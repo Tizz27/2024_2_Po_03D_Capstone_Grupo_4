@@ -7,7 +7,7 @@ class Cliente(models.Model):
     email = models.EmailField(unique=True)
     contraseña = models.CharField(max_length=255)
     direccion = models.CharField(max_length=200, blank=True, null=True)
-    rut = models.CharField(max_length=12, unique=True)
+    rut = models.CharField(max_length=9, unique=True)
     fecha_registro = models.DateField(auto_now_add=True)  # Se registra automáticamente la fecha
 
     class Meta:
@@ -68,9 +68,9 @@ class Producto(models.Model):
     id_producto = models.AutoField(primary_key=True)
     nombre_producto = models.CharField(max_length=30)
     descripcion = models.CharField(max_length=200, blank=True, null=True)
-    precio = models.DecimalField(max_digits=6, decimal_places=2)
+    precio = models.DecimalField(max_digits=6, decimal_places=0)
     stock = models.IntegerField()
-    imagen = models.ImageField(upload_to="./static/img/")
+    imagen = models.ImageField(upload_to="img/productos/")
     categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE, related_name='productos')
     administrador = models.ForeignKey(Administrador, on_delete=models.CASCADE, related_name='productos')
 

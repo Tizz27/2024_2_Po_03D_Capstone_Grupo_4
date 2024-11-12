@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 import os
 
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -38,6 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'crispy_bootstrap4',
+    'crispy_forms',
     'panaderia',
 ]
 
@@ -77,9 +81,9 @@ WSGI_APPLICATION = 'proyecto.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',   # Usa el backend MySQL
-        'NAME': 'backend_pan',                  # Nombre de tu base de datos
+        'NAME': 'arteenmasa',                  # Nombre de tu base de datos
         'USER': 'root',                   # Usuario de MySQL
-        'PASSWORD': 'root',            # Contraseña de MySQL
+        'PASSWORD': '23Deabril',            # Contraseña de MySQL
         'HOST': 'localhost',                    # Dirección del host (localhost para máquina local)
         'PORT': '3306',                         # Puerto de MySQL (3306 es el predeterminado)
     }
@@ -121,7 +125,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -130,3 +133,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'  # O 'bootstrap5' si prefieres
