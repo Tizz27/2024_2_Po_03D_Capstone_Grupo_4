@@ -70,7 +70,7 @@ class Producto(models.Model):
     descripcion = models.CharField(max_length=200, blank=True, null=True)
     precio = models.DecimalField(max_digits=6, decimal_places=2)
     stock = models.IntegerField()
-    imagen = models.ImageField(upload_to="img/productos/")
+    imagen = models.ImageField(upload_to="./static/img/")
     categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE, related_name='productos')
     administrador = models.ForeignKey(Administrador, on_delete=models.CASCADE, related_name='productos')
 

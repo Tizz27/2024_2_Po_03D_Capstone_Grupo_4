@@ -1,40 +1,103 @@
-{% extends 'base.html' %}
 {% load static %}
-{% block contenido %}
-    <li>
-        <form method="POST" action="/menu/">
-            {% csrf_token %} 
-      <div class="container">
-      <div class="col-md- 8 g-9" >
-      <div class="box">
-      <div class="row mt-8">
-    
-    <div class="row justify-content-center">
-        <table class="table">
-            <tr>
-                <th>Nombre</th>
-                <th>descripcion</th>
-                <th>precio</th>
-           
-                
-                
-            </tr>
-        {% for p in productos %}
-            <tr>
-                <td>{{ p.nombre_producto }}</td>
-                <td>{{ p.descripcion}}</td>
-                <td>{{ p.precio }}</td>
-                
-                
-                <td><a href="{% url 'modificar' p.id_producto %}" class="btn btn-secondary">Modificar</a></td>
-                <td><a href="{% url 'eliminar' p.id_producto %}" class="btn btn-warning">Eliminar</a></td>
-    
-            </tr>
-            
-          </form>
-    </li>
-    {% endfor %}
-  </body>
-  {% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>Arte en Masa</title>
+</head>
+<body>
 
+    <!-- Navbar principal -->
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <img src="{% static 'img/Logo.png' %}" alt="Logo" class="navbar-logo">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" 
+                    data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <!-- Menú principal (visible en pantallas grandes) -->
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#">Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Productos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Sobre Nosotros</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="contacto.html">Contacto</a>
+                    </li>
+                </ul>
+                <form class="d-flex" role="search">
+                    <input class="form-control me-2" type="search" placeholder="Buscar" aria-label="Search">
+                    <button class="btn button" type="submit">Buscar</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Sidebar (offcanvas) para móviles -->
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Menú</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#">Inicio</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="lista_productos.html">Productos</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="contacto">Contacto</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/Login/">Iniciar Sesion</a>
+                </li>
+            </ul>
+            <form class="d-flex mt-3">
+                <input class="form-control" type="search" placeholder="Buscar" aria-label="Buscar">
+            </form>
+        </div>
+    </div>  
+
+    <!-- Carrusel de productos -->
+    <main>
+        <div id="carouselExampleAutoplaying" class="carousel slide mx-auto" data-bs-ride="carousel" style="max-width: 600px;">
+            <div class="carousel-inner">
+                {% for producto in productos %}
+                <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                    <img src="{{ producto.imagen.url }}" class="d-block w-100 fixed-size" alt="{{ producto.nombre_producto }}">
+                </div>
+                {% endfor %}
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2023 Arte en Masa. Todos los derechos reservados.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
 </html>

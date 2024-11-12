@@ -1,0 +1,407 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}Contacto - Arte en Masa{% endblock %}
+
+{% block content %}
+<!-- Navbar principal -->
+<nav class="navbar navbar-expand-lg navbar-custom">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">
+            <img src="{% static 'img/Logo.png' %}" alt="Logo" class="navbar-logo">
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" 
+                data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <!-- Menú principal (visible en pantallas grandes) -->
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'menu' %}">Inicio</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'productos' %}">Productos</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'sobre_nosotros' %}">Sobre Nosotros</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="{% url 'contacto' %}">Contacto</a>
+                </li>
+            </ul>
+            <form class="d-flex" role="search">
+                <input class="form-control me-2" type="search" placeholder="Buscar" aria-label="Search">
+                <button class="btn button" type="submit">Buscar</button>
+            </form>
+        </div>
+    </div>
+</nav>
+
+<!-- Sidebar (offcanvas) para móviles -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Menú</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'menu' %}">Inicio</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'productos' %}">Productos</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" href="{% url 'contacto' %}">Contacto</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'login' %}">Iniciar Sesion</a>
+            </li>
+        </ul>
+        <form class="d-flex mt-3">
+            <input class="form-control" type="search" placeholder="Buscar" aria-label="Buscar">
+        </form>
+    </div>
+</div>
+
+<!-- Contenido principal -->
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white text-center">
+                    <h3 class="mb-0">Formulario de Pedido</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{% url 'contacto' %}" id="formularioPedido">
+                        {% csrf_token %}
+                        
+                        <!-- Nombre -->
+                        <div class="form-group mb-3">
+                            <label for="nombre" class="form-label">Nombre Completo</label>
+                            <input type="text" class="form-control" id="nombre" name="nombre" required>
+                        </div>
+
+                        <!-- Correo -->
+                        <div class="form-group mb-3">
+                            <label for="email" class="form-label">Correo Electrónico</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+
+                        <!-- Teléfono -->
+                        <div class="form-group mb-3">
+                            <label for="telefono" class="form-label">Número de Teléfono</label>
+                            <input type="tel" class="form-control" id="telefono" name="telefono" 
+                                   pattern="[0-9]{9}" title="Ingrese un número de 9 dígitos" required>
+                        </div>
+
+                        <!-- Productos Dropdown -->
+                        <div class="form-group mb-3">
+                            <label for="producto" class="form-label">Seleccione el Producto</label>
+                            <select class="form-select" id="producto" name="producto" required>
+                                <option value="">Seleccione un producto</option>
+                                {% for producto in productos %}
+                                    <option value="{{ producto.id_producto }}">
+                                        {{ producto.nombre_producto }} - ${{ producto.precio }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Cantidad -->
+                        <div class="form-group mb-3">
+                            <label for="cantidad" class="form-label">Cantidad</label>
+                            <input type="number" class="form-control" id="cantidad" name="cantidad" 
+                                   min="1" value="1" required>
+                        </div>
+
+                        <!-- Comentarios -->
+                        <div class="form-group mb-3">
+                            <label for="comentarios" class="form-label">Comentarios Adicionales</label>
+                            <textarea class="form-control" id="comentarios" name="comentarios" 
+                                      maxlength="100" rows="3" 
+                                      placeholder="Máximo 100 caracteres"></textarea>
+                            <div class="form-text" id="caracteresRestantes">
+                                Caracteres restantes: 100
+                            </div>
+                        </div>
+
+                        <!-- Botones -->
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Enviar Pedido</button>
+                            <button type="reset" class="btn btn-secondary">Limpiar Formulario</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer mt-5">
+    <p>&copy; 2023 Arte en Masa. Todos los derechos reservados.</p>
+</footer>
+
+<!-- Script para contar caracteres y validar formulario -->
+<script>
+    document.getElementById('comentarios').addEventListener('input', function() {
+        const maxLength = 100;
+        const currentLength = this.value.length;
+        const remaining = maxLength - currentLength;
+        document.getElementById('caracteresRestantes').textContent = 
+            `Caracteres restantes: ${remaining}`;
+    });
+
+    // Validación del formulario
+    document.getElementById('formularioPedido').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Validar nombre
+        const nombre = document.getElementByI d('nombre').value;
+        if (nombre.trim() === '') {
+            alert('Por favor ingrese su nombre');
+            return;
+        }
+
+        // Validar email
+        const email = document.getElementById('email').value;
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            alert('Por favor ingrese un email válido');
+            return;
+        }
+
+        // Validar teléfono
+        const telefono = document.getElementById('telefono').value;
+        if (telefono.length !== 9 || isNaN(telefono)) {
+            alert('Por favor ingrese un número de teléfono válido de 9 dígitos');
+            return;
+        }
+
+        // Validar producto seleccionado
+        const producto = document.getElementById('producto').value;
+        if (producto === '') {
+            alert('Por favor seleccione un producto');
+            return;
+        }
+
+        // Validar cantidad
+        const cantidad = document.getElementById('cantidad').value;
+        if (cantidad < 1) {
+            alert('Por favor ingrese una cantidad válida');
+            return;
+        }
+
+        // Si todo está correcto, enviar el formulario
+        this.submit();
+    });
+</script>
+
+{% endblock %}
+``` ```html
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}Contacto - Arte en Masa{% endblock %}
+
+{% block content %}
+<!-- Navbar principal -->
+<nav class="navbar navbar-expand-lg navbar-custom">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">
+            <img src="{% static 'img/Logo.png' %}" alt="Logo" class="navbar-logo">
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" 
+                data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <!-- Menú principal (visible en pantallas grandes) -->
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'menu' %}">Inicio</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'productos' %}">Productos</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'sobre_nosotros' %}">Sobre Nosotros</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="{% url 'contacto' %}">Contacto</a>
+                </li>
+            </ul>
+            <form class="d-flex" role="search">
+                <input class="form-control me-2" type="search" placeholder="Buscar" aria-label="Search">
+                <button class="btn button" type="submit">Buscar</button>
+            </form>
+        </div>
+    </div>
+</nav>
+
+<!-- Sidebar (offcanvas) para móviles -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Menú</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'menu' %}">Inicio</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'productos' %}">Productos</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" href="{% url 'contacto' %}">Contacto</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'login' %}">Iniciar Sesion</a>
+            </li>
+        </ul>
+        <form class="d-flex mt-3">
+            <input class="form-control" type="search" placeholder="Buscar" aria-label="Buscar">
+        </form>
+    </div>
+</div>
+
+<!-- Contenido principal -->
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white text-center">
+                    <h3 class="mb-0">Formulario de Pedido</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{% url 'contacto' %}" id="formularioPedido">
+                        {% csrf_token %}
+                        
+                        <!-- Nombre -->
+                        <div class="form-group mb-3">
+                            <label for="nombre" class="form-label">Nombre Completo</label>
+                            <input type="text" class="form-control" id="nombre" name="nombre" required>
+                        </div>
+
+                        <!-- Correo -->
+                        <div class="form-group mb-3">
+                            <label for="email" class="form-label">Correo Electrónico</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+
+                        <!-- Teléfono -->
+                        <div class="form-group mb-3">
+                            <label for="telefono" class="form-label">Número de Teléfono</label>
+                            <input type="tel" class="form-control" id="telefono" name="telefono" 
+                                   pattern="[0-9]{9 }" title="Ingrese un número de 9 dígitos" required>
+                        </div>
+
+                        <!-- Productos Dropdown -->
+                        <div class="form-group mb-3">
+                            <label for="producto" class="form-label">Seleccione el Producto</label>
+                            <select class="form-select" id="producto" name="producto" required>
+                                <option value="">Seleccione un producto</option>
+                                {% for producto in productos %}
+                                    <option value="{{ producto.id_producto }}">
+                                        {{ producto.nombre_producto }} - ${{ producto.precio }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Cantidad -->
+                        <div class="form-group mb-3">
+                            <label for="cantidad" class="form-label">Cantidad</label>
+                            <input type="number" class="form-control" id="cantidad" name="cantidad" 
+                                   min="1" value="1" required>
+                        </div>
+
+                        <!-- Comentarios -->
+                        <div class="form-group mb-3">
+                            <label for="comentarios" class="form-label">Comentarios Adicionales</label>
+                            <textarea class="form-control" id="comentarios" name="comentarios" 
+                                      maxlength="100" rows="3" 
+                                      placeholder="Máximo 100 caracteres"></textarea>
+                            <div class="form-text" id="caracteresRestantes">
+                                Caracteres restantes: 100
+                            </div>
+                        </div>
+
+                        <!-- Botones -->
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Enviar Pedido</button>
+                            <button type="reset" class="btn btn-secondary">Limpiar Formulario</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer mt-5">
+    <p>&copy; 2023 Arte en Masa. Todos los derechos reservados.</p>
+</footer>
+
+<!-- Script para contar caracteres y validar formulario -->
+<script>
+    document.getElementById('comentarios').addEventListener('input', function() {
+        const maxLength = 100;
+        const currentLength = this.value.length;
+        const remaining = maxLength - currentLength;
+        document.getElementById('caracteresRestantes').textContent = 
+            `Caracteres restantes: ${remaining}`;
+    });
+
+    // Validación del formulario
+    document.getElementById('formularioPedido').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Validar nombre
+        const nombre = document.getElementById('nombre').value;
+        if (nombre.trim() === '') {
+            alert('Por favor ingrese su nombre');
+            return;
+        }
+
+        // Validar email
+        const email = document.getElementById('email').value;
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            alert('Por favor ingrese un email válido');
+            return;
+        }
+
+        // Validar teléfono
+        const telefono = document.getElementById('telefono').value;
+        if (telefono.length !== 9 || isNaN(telefono)) {
+            alert('Por favor ingrese un número de teléfono válido de 9 dígitos');
+            return;
+        }
+
+        // Validar producto seleccionado
+        const producto = document.getElementById('producto').value;
+        if (producto === '') {
+            alert('Por favor seleccione un producto');
+            return;
+        }
+
+        // Validar cantidad
+        const cantidad = document.getElementById('cantidad').value;
+        if (cantidad < 1) {
+            alert('Por favor ingrese una cantidad válida');
+            return;
+        }
+
+        // Si todo está correcto, enviar el formulario
+        this.submit();
+    });
+</script>
+
+{% endblock %}
