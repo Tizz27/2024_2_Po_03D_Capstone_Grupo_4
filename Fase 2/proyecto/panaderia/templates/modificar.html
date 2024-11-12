@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block contenido %}
+{% load crispy_forms_tags%}
+<br>
+<br>
+<br>
+
+<div class="container-fluid col-md-6 offset-md-3" style="background-color:rgba(255, 255, 255, 0.477);">
+    <div class="row mb-5">
+        <br>
+        <div class="text-center">
+            <br>
+            <h3>Editar Producto</h3>
+        </div>        
+    
+        <form method="POST" enctype="multipart/form-data" onsubmit="return Guardar()">
+            {% csrf_token %} 
+            {{ form | crispy }}
+            <br>
+            <button type="submit" name="Guardar" class="btn tipo1 flagf float-end button">Guardar</button>
+            <a href="/menu/" class="btn tipo1 flagf float-end button">Cancelar</a>    
+            <br>
+            <br>    
+        </form>
+      
+{{mensaje}}
+</div>
+</div>
+{% endblock %}

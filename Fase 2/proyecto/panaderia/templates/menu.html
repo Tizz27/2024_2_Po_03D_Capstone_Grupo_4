@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block contenido %}
+    <li>
+        <form method="POST" action="/menu/">
+            {% csrf_token %} 
+      <div class="container">
+      <div class="col-md- 8 g-9" >
+      <div class="box">
+      <div class="row mt-8">
+    
+    <div class="row justify-content-center">
+        <table class="table">
+            <tr>
+                <th>Nombre</th>
+                <th>descripcion</th>
+                <th>precio</th>
+           
+                
+                
+            </tr>
+        {% for p in productos %}
+            <tr>
+                <td>{{ p.nombre_producto }}</td>
+                <td>{{ p.descripcion}}</td>
+                <td>{{ p.precio }}</td>
+                
+                
+                <td><a href="{% url 'modificar' p.id_producto %}" class="btn btn-secondary">Modificar</a></td>
+                <td><a href="{% url 'eliminar' p.id_producto %}" class="btn btn-warning">Eliminar</a></td>
+    
+            </tr>
+            
+          </form>
+    </li>
+    {% endfor %}
+  </body>
+  {% endblock %}
+
+</html>
