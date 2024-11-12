@@ -1,7 +1,8 @@
 from django.urls import path
-from .views import menu, modificar,eliminar,registrar_producto,base, mostrar_productos,registrar_cliente, login,agregar_al_carrito,ver_carrito,eliminar_del_carrito,confirmar_pedido
+from .views import base,menu, modificar,eliminar,registrar_producto,base, mostrar_productos,registrar_cliente, login,agregar_al_carrito,ver_carrito,eliminar_del_carrito,confirmar_pedido
 
 urlpatterns =[
+    path('base/', base, name='base'),
     path('menu/', menu, name='menu'),
     path('modificar/<id_producto>/', modificar, name='modificar'),
     path('eliminar/<id_producto>/', eliminar, name='eliminar'),

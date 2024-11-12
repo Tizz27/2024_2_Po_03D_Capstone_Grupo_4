@@ -10,6 +10,7 @@ from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm
 
 
+
 # views.py
 from .models import DetallePedido, Pedido, Producto
 from django.contrib.sessions.models import Session
@@ -218,3 +219,6 @@ def login_cliente(request):
 
     # Renderizar el formulario
     return render(request, 'login.html', {'form': form})
+
+def base(request):
+    return render(request, 'base.html')
