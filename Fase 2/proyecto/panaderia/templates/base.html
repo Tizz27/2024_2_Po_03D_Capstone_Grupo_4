@@ -42,13 +42,24 @@
                 <li class="nav-item">
                     <a class="nav-link" href="contacto.html">Contacto</a>
                 </li>
+
+                {% if user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'salir' %}">Cerrar sesion</a>
+                </li>
+                {% else %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'login' %}">Iniciar sesion</a>
+                </li>
+                {% endif %}
+            </div>
             </ul>
             <form class="d-flex" role="search">
                 <input class="form-control me-2" type="search" placeholder="Buscar" aria-label="Search">
                 <button class="btn button" type="submit">Buscar</button>
             </form>
         </div>
-    </div>
+       
 </nav>
 
 <!-- Sidebar (offcanvas) para móviles -->
@@ -75,6 +86,7 @@
         <form class="d-flex mt-3">
             <input class="form-control" type="search" placeholder="Buscar" aria-label="Buscar">
         </form>
+        
     </div>
 </div>  
  
