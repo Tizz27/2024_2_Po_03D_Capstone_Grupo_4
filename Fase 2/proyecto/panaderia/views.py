@@ -7,6 +7,58 @@ from .forms import ClienteForm
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth import logout
 
+from .forms import LoginForm
+from .models import Cliente
+from django.contrib import messages
+
+def home(request):
+    # Verificamos si el cliente está logueado
+    cliente_id = request.session.get('cliente_id')
+    cliente = None
+    if cliente_id:
+        try:
+            # Obtenemos el cliente desde la base de datos
+            cliente = Cliente.objects.get(id_cliente=cliente_id)
+        except Cliente.DoesNotExist:
+            return redirect('login1')  # Si el cliente no existe, redirigir al login
+
+    # Pasamos el cliente y el estado de la sesión al template
+    return render(request, 'home.html', {'cliente': cliente, 'is_logged_in': bool(cliente)})
+
+def cerrar_sesion(request):
+    if 'cliente_id' in request.session:
+        del request.session['cliente_id']
+    return redirect('home.html')
+
+def login_view(request):
+    if request.method == 'POST':
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            contraseña = form.cleaned_data['contraseña']
+            
+            # Intentar encontrar el cliente por su email
+            try:
+                cliente = Cliente.objects.get(email=email)
+                
+                # Verificar que la contraseña coincida (sin cifrado, en tu caso)
+                if cliente.contraseña == contraseña:
+                    # Si la contraseña es correcta, guardamos el 'id_cliente' en la sesión
+                    request.session['cliente_id'] = cliente.id_cliente
+                    
+                    # Redirigimos a la página de inicio u otra página protegida
+                    return redirect('home')  # Aquí puedes cambiar 'home' por la URL que desees
+
+                else:
+                    messages.error(request, 'Correo electrónico o contraseña incorrectos.')
+            except Cliente.DoesNotExist:
+                messages.error(request, 'Correo electrónico o contraseña incorrectos.')
+    else:
+        form = LoginForm()
+
+    # Renderizamos el formulario de login en la página
+    return render(request, 'login1.html', {'form': form})
+
 def salir(request):
     logout(request)
     return render (request,'base.html')
@@ -21,48 +73,22 @@ def registrar_cliente(request):
         rut = request.POST.get('rut')
         if not validar_rut(rut):
             data["mensaje"] = "RUT inválido"
-            return render(request, 'login_cliente.html', data)
+            return render(request, 'registrar_cliente.html', data)
 
         if formulario.is_valid():
             cliente = formulario.save(commit=False)
             cliente.contraseña = make_password(cliente.contraseña)
             cliente.save()
             data["mensaje"] = "Cliente registrado"
-            return redirect('menu')
+            return redirect('base.html')
 
-    return render(request, 'login_cliente.html', data)
-
-
-def validar_rut(rut):
-    # Separar el número y el dígito verificador
-    rut = rut.replace(".", "").replace("-", "")
-    if len(rut) < 2:
-        return False
-    
-    numero = rut[:-1]
-    dv = rut[-1].upper()
-
-    # Calcular el dígito verificador
-    suma = 0
-    multiplo = 2
-
-    for i in reversed(range(len(numero))):
-        suma += int(numero[i]) * multiplo
-        multiplo = 9 if multiplo == 7 else multiplo + 1
-
-    dv_calculado = 11 - (suma % 11)
-
-    if dv_calculado == 11:
-        dv_calculado = '0'
-    elif dv_calculado == 10:
-        dv_calculado = 'K'
-
-    return str(dv_calculado) == dv
+    return render(request, 'registrar_cliente.html', data)
 
 
-def menu(request):
+
+def gestion(request):
     listaproductos= Producto.objects.all()
-    return render(request,"menu.html", {"productos": listaproductos})
+    return render(request,"gestionproducto.html", {"productos": listaproductos})
 
 def base(request):
     return render (request,'base.html')
@@ -94,7 +120,7 @@ def modificar(request, id_producto):
 def eliminar (request,id_producto):
     productos= get_object_or_404(Producto, id_producto=id_producto)
     productos.delete()
-    return redirect(to="menu")   
+    return redirect(to="gestionproducto")   
 
 def mostrar_productos(request):
     productos = Producto.objects.all()
@@ -102,3 +128,8 @@ def mostrar_productos(request):
 
 def base(request):
     return render(request, 'base.html')
+
+
+def cerrar(request):
+    logout(request)
+    return render (request,'home.html')

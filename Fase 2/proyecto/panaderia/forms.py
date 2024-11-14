@@ -23,3 +23,7 @@ class ClienteForm(forms.ModelForm):
             'fecha_nacimiento': forms.DateInput(attrs={'type': 'date'}),
             'contraseña': forms.PasswordInput(),
         }
+
+class LoginForm(forms.Form):
+    email = forms.EmailField()
+    contraseña = forms.CharField(widget=forms.PasswordInput)
