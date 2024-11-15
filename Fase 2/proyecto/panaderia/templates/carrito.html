@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block contenido %}
+<div class="container mt-4">
+    <h2>Carrito de Compras</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Producto</th>
+                <th>Precio</th>
+                <th>Cantidad</th>
+                <th>Subtotal</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for key, item in carrito.items %}
+            <tr>
+                <td>{{ item.nombre }}</td>
+                <td>${{ item.precio }}</td>
+                <td>{{ item.cantidad }}</td>
+                <td>${{ item.subtotal }}</td>
+                <td>
+                    <a href="{% url 'eliminar_del_carrito' key %}" class="btn btn-danger">Eliminar</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <h3>Total: ${{ total }}</h3>
+    <a href="#" class="btn btn-success">Proceder al pago</a>
+    <a href="{% url 'mostrar_productos' %}"  class="btn btn-success">Volver</a>
+</div>
+{% endblock %}

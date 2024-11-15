@@ -269,3 +269,9 @@ main {
     padding-left: 1rem;
     padding-right: 1rem;
 }
+
+/* Estilo para el desvanecimiento del mensaje de alerta */
+.fade-out {
+    opacity: 0;
+    transition: opacity 0.5s ease-out;
+}
