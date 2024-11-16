@@ -16,27 +16,31 @@
 <form method="POST" action="/mostrar_productos/">
   {% csrf_token %}
   
-  <!-- Navbar principal -->
   <nav class="navbar navbar-expand-lg navbar-custom">
     <div class="container-fluid">
-        <a class="navbar-brand" href="#">
+        <!-- Logo -->
+        <a class="navbar-brand" href="base.html">
             <img src="{% static 'img/Logo.png' %}" alt="Logo" class="navbar-logo">
         </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" 
-                data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+        
+        <!-- Botón hamburguesa -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" 
+                data-bs-target="#navbarContent" aria-controls="navbarContent" 
+                aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <!-- Menú principal (visible en pantallas grandes) -->
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav me-auto">
+
+        <!-- Contenido del navbar -->
+        <div class="collapse navbar-collapse" id="navbarContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a class="nav-link active" href="#">Inicio</a>
+                    <a class="nav-link" href="{% url 'base' %}">Inicio</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Productos</a>
+                    <a class="nav-link" href="/productos/">Productos</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Sobre Nosotros</a>
+                    <a class="nav-link" href="sobrenosotros.html">Sobre Nosotros</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="contacto.html">Contacto</a>
@@ -44,26 +48,28 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'ver_carrito' %}">Ver Carrito</a>
                 </li>
-                {% if cliente %}
+                {% if is_logged_in %}
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'cerrar' %}">Cerrar sesión</a>
+                    <a class="nav-link" href="{% url 'cerrar' %}">Cerrar sesion</a>
                 </li>
                 {% else %}
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'login1' %}">Iniciar sesión</a>
+                    <a class="nav-link" href="{% url 'login1' %}">Iniciar sesion</a>
                 </li>
                 {% endif %}
+                
             </ul>
+            
+            <!-- Formulario de búsqueda -->
             <form class="d-flex" role="search">
                 <input class="form-control me-2" type="search" placeholder="Buscar" aria-label="Search">
                 <button class="btn button" type="submit">Buscar</button>
             </form>
         </div>
     </div>
-  </nav>
+</nav>
 
-  <!-- Mostrar mensajes -->
-  {% if messages %}
+{% if messages %}
     <div class="container mt-3" id="message-container">
         {% for message in messages %}
             <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
@@ -72,46 +78,6 @@
         {% endfor %}
     </div>
   {% endif %}
-
-  <!-- Sidebar (offcanvas) para móviles -->
-  <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
-      <div class="offcanvas-header">
-          <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Menú</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-      </div>
-      <div class="offcanvas-body">
-          <ul class="navbar-nav">
-              <li class="nav-item">
-                  <a class="nav-link active" href="#">Inicio</a>
-              </li>
-              <li class="nav-item">
-                  <a class="nav-link" href="{% url 'mostrar_productos' %}">Productos</a>
-              </li>
-              <li class="nav-item">
-                  <a class="nav-link" href="contacto">Contacto</a>
-              </li>
-              <li class="nav-item">
-                  <a class="nav-link" href="/Login/">Iniciar Sesión</a>
-              </li>
-              <li class="nav-item">
-                  <a class="nav-link" href="/carrito/">Ver Carrito</a>
-              </li>
-          </ul>
-          <form class="d-flex mt-3">
-              <input class="form-control" type="search" placeholder="Buscar" aria-label="Buscar">
-          </form>
-      </div>
-  </div>
-
-  <!-- Mensaje de bienvenida -->
-  <div class="container mt-3">
-    {% if cliente %}
-    <h2>Bienvenido, {{ cliente.nombre_completo }}</h2>
-    <p>Tu correo electrónico es: {{ cliente.email }}</p>
-    {% else %}
-    <h2>Bienvenido, visitante</h2>
-    {% endif %}
-  </div>
 
   <!-- Bloque de productos -->
   <div class="container mt-4">

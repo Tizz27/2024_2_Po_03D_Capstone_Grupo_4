@@ -127,22 +127,13 @@ def login_view(request):
         if form.is_valid():
             email = form.cleaned_data['email']
             contraseña = form.cleaned_data['contraseña']
-            
-            # Intentar encontrar el cliente por su email
+
             try:
                 cliente = Cliente.objects.get(email=email)
-                
-                # Verificar que la contraseña coincida
+
                 if cliente.contraseña == contraseña:
                     # Si la contraseña es correcta, guardamos el 'id_cliente' en la sesión
                     request.session['cliente_id'] = cliente.id_cliente
-
-                    # Sincronizar el carrito de la sesión con la base de datos
-                    if 'carrito' in request.session:
-                        carrito = request.session['carrito']
-                        guardar_carrito_bd(cliente, carrito)
-                        # Limpiar el carrito de la sesión
-                        del request.session['carrito']
 
                     # Redirigir al usuario a la página de productos u otra página
                     return redirect('mostrar_productos') 
@@ -156,7 +147,7 @@ def login_view(request):
 
     return render(request, 'login1.html', {'form': form})
 
-def home(request):
+def base(request):
     # Verificamos si el cliente está logueado
     cliente_id = request.session.get('cliente_id')
     cliente = None
@@ -168,17 +159,12 @@ def home(request):
             return redirect('login1')  # Si el cliente no existe, redirigir al login
 
     # Pasamos el cliente y el estado de la sesión al template
-    return render(request, 'home.html', {'cliente': cliente, 'is_logged_in': bool(cliente)})
-
-def cerrar_sesion(request):
-    if 'cliente_id' in request.session:
-        del request.session['cliente_id']
-    return redirect('home.html')
+    return render(request, 'base.html', {'cliente': cliente, 'is_logged_in': bool(cliente)})
 
 
 def salir(request):
     logout(request)
-    return render (request,'base.html')
+    return render (request,'home.html')
 
 def registrar_cliente(request):
     data = {'form': ClienteForm()}
@@ -202,13 +188,12 @@ def registrar_cliente(request):
     return render(request, 'registrar_cliente.html', data)
 
 
-
 def gestion(request):
     listaproductos= Producto.objects.all()
     return render(request,"gestionproducto.html", {"productos": listaproductos})
 
-def base(request):
-    return render (request,'base.html')
+def home(request):
+    return render (request,'home.html')
 
 def registrar_producto(request):
     data = {
@@ -232,7 +217,6 @@ def modificar(request, id_producto):
         form = ProductoForm(instance=producto)
     
     return render(request, 'modificar.html', {'form': form, 'producto': producto})  
-
     
 def eliminar (request,id_producto):
     productos= get_object_or_404(Producto, id_producto=id_producto)
@@ -252,14 +236,6 @@ def mostrar_productos(request):
     # Pasar los productos y cliente al template
     return render(request, 'mostrar_productos.html', {'productos': productos, 'cliente': cliente, 'is_logged_in': bool(cliente)})
 
-
-
-
-
-def base(request):
-    return render(request, 'base.html')
-
-
 def cerrar(request):
     logout(request)
-    return render (request,'home.html')
+    return render (request,'base.html')
