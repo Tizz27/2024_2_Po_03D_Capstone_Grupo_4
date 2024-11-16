@@ -3,9 +3,31 @@
     --color-secundario: #f8f9fa;
     --color-texto: #333333;
     --color-hover: #FF8787;
-    --color-fondo: #F8F9FA;
+    --color-fondo: #dad6c4;
+    --color-primario-rgb: 255, 107, 107;
 }
 
+/* Personalización del scrollbar */
+::-webkit-scrollbar {
+    width: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--color-secundario);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--color-primario);
+    border-radius: 10px;
+    border: 3px solid var(--color-secundario);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--color-hover);
+}
+
+/* Estilos Base */
 body {
     font-family: 'Poppins', sans-serif;
     margin: 0;
@@ -16,105 +38,7 @@ body {
     background-color: var(--color-fondo);
 }
 
-/* Navbar */
-.navbar-custom {
-    background-color: var(--color-secundario);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    padding: 0.5rem 1rem;
-    height: 120px;
-    display: flex;
-    align-items: center;
-}
-
-.navbar-custom .navbar-brand {
-    display: flex;
-    align-items: center;
-    color: var(--color-primario);
-    font-weight: 700;
-    font-size: 1.4rem;
-    letter-spacing: 0.5px;
-    padding: 0;
-    margin: 0;
-    height: 100%;
-}
-
-.navbar-logo {
-    height: 100px;
-    width: auto;
-    object-fit: contain;
-    margin-right: 20px;
-    transition: transform 0.3s ease;
-}
-
-.navbar-custom .navbar-nav {
-    align-items: center;
-    height: 100%;
-}
-
-.navbar-custom .navbar-nav .nav-link {
-    color: var(--color-texto);
-    font-weight: 500;
-    transition: all 0.3s ease;
-    padding: 0.5rem 1rem;
-    margin: 0 0.25rem;
-    border-radius: 4px;
-    font-size: 1rem;
-    line-height: 1;
-    border: 1px solid transparent;
-}
-
-.navbar-custom .navbar-nav .nav-link:hover {
-    color: var(--color-hover);
-    background-color: rgba(255, 107, 107, 0.1);
-    border-color: var(--color-primario);
-}
-
-.navbar-custom .navbar-nav .nav-link.active {
-    color: var(--color-primario);
-    background-color: rgba(255, 107, 107, 0.1);
-    border-color: var(--color-primario);
-}
-
-/* Formulario de búsqueda */
-.form-control {
-    border: 1px solid #ddd;
-    border-radius: 20px;
-    padding: 0.5rem 1rem;
-    font-size: 1rem;
-}
-
-.form-control:focus {
-    border-color: var(--color-primario);
-    box-shadow: 0 0 0 0.2rem rgba(255, 107, 107, 0.25);
-}
-
-/* Main content */
-main {
-    flex: 1;
-    padding: 2rem 0;
-}
-
-/* Carrusel */
-.carousel {
-    margin-bottom: 2rem;
-}
-
-.carousel .fixed-size {
-    height: 400px;
-    object-fit: cover;
-    border-radius: 10px;
-}
-
-/* Footer */
-.footer {
-    background-color: var(--color-secundario);
-    color: var(--color-texto);
-    text-align: center;
-    padding: 1rem 0;
-    margin-top: auto;
-}
-
-/* Botones personalizados */
+/* Componentes Generales */
 .button {
     background-color: var(--color-primario);
     color: white;
@@ -129,40 +53,76 @@ main {
     transform: translateY(-2px);
 }
 
-/* Media queries */
-@media (max-width: 991.98px) {
-    .navbar-custom {
-        height: 80px;
-    }
-
-    .navbar-logo {
-        height: 70px;
-    }
+/* Navbar */
+.navbar-custom {
+    background-color: var(--color-secundario);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 0.5rem 1rem;
+    min-height: 80px;
 }
 
-@media (max-width: 767.98px) {
-    .navbar-custom {
-        height: 70px;
-    }
-
-    .navbar-custom .navbar-brand {
-        font-size: 1.2rem;
-    }
-
-    .navbar-logo {
-        height: 60px;
-    }
-
-    .navbar-custom .navbar-nav .nav-link {
-        font-size: 0.9rem;
-    }
-
-    .carousel .fixed-size {
-        height: 300px;
-    }
+.navbar-custom .navbar-brand {
+    display: flex;
+    align-items: center;
+    color: var(--color-primario);
+    font-weight: 700;
+    font-size: 1.4rem;
+    letter-spacing: 0.5px;
 }
 
-/* Estilos para formularios */
+.navbar-logo {
+    height: 60px;
+    width: auto;
+    object-fit: contain;
+    margin-right: 20px;
+    transition: transform 0.3s ease;
+}
+
+.navbar-custom .navbar-toggler {
+    border-color: var(--color-primario);
+    padding: 0.25rem 0.75rem;
+}
+
+.navbar-custom .navbar-toggler:focus {
+    box-shadow: 0 0 0 0.2rem rgba(255, 107, 107, 0.25);
+    outline: none;
+}
+
+.navbar-custom .navbar-nav {
+    align-items: center;
+}
+
+.navbar-custom .navbar-nav .nav-link {
+    color: var(--color-texto);
+    font-weight: 500;
+    transition: all 0.3s ease;
+    padding: 0.5rem 1rem;
+    margin: 0 0.25rem;
+    border-radius: 4px;
+    font-size: 1rem;
+    border: 1px solid transparent;
+}
+
+.navbar-custom .navbar-nav .nav-link:hover,
+.navbar-custom .navbar-nav .nav-link.active {
+    color: var(--color-primario);
+    background-color: rgba(255, 107, 107, 0.1);
+    border-color: var(--color-primario);
+}
+
+/* Formularios */
+.form-control {
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+}
+
+.form-control:focus {
+    border-color: var(--color-primario);
+    box-shadow: 0 0 0 0.2rem rgba(255, 107, 107, 0.25);
+}
+
 .form-container {
     background-color: white;
     padding: 2rem;
@@ -181,7 +141,7 @@ main {
     color: var(--color-texto);
 }
 
-/* Estilos para mensajes de error */
+/* Alertas y Mensajes */
 .alert {
     border-radius: 8px;
     margin: 1rem 0;
@@ -194,7 +154,82 @@ main {
     color: #cc0000;
 }
 
-/* Estilos para tarjetas de productos */
+.fade-out {
+    opacity: 0;
+    transition: opacity 0.5s ease-out;
+}
+
+/* Carrusel */
+.carousel-container {
+    max-width: 800px;
+    margin: 0 auto 8rem auto; /* Aumentado el margin-bottom */
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+.carousel-img {
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+    object-position: center;
+}
+
+.carousel-caption {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    background-color: rgba(0, 0, 0, 0.6);
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+    color: white;
+    font-size: 1rem;
+    line-height: 1.4;
+    z-index: 10;
+}
+
+.carousel-control-prev,
+.carousel-control-next {
+    width: 5%;
+    opacity: 0.8;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 0;
+    margin: 0 10px;
+}
+
+.carousel-control-prev:hover,
+.carousel-control-next:hover {
+    opacity: 1;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+    width: 2rem;
+    height: 2rem;
+}
+
+.carousel-indicators {
+    margin-bottom: 1rem;
+}
+
+.carousel-indicators [data-bs-target] {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: var(--color-primario);
+    opacity: 0.5;
+}
+
+.carousel-indicators .active {
+    opacity: 1;
+}
+
+/* Tarjetas */
 .card {
     border: none;
     border-radius: 10px;
@@ -233,45 +268,259 @@ main {
     font-size: 1.2rem;
 }
 
-/* Estilos para el offcanvas */
-.offcanvas {
+/* Layout */
+main {
+    flex: 1;
+    padding: 2rem 0 4rem 0; /* Aumentado el padding-bottom */
+}
+
+.footer {
     background-color: var(--color-secundario);
+    color: var(--color-texto);
+    text-align: center;
+    padding: 1rem 0;
+    margin-top: auto;
 }
 
-.offcanvas-header {
-    border-bottom: 1px solid #ddd;
-}
-
-.offcanvas-title {
-    color: var(--color-primario);
-    font-weight: 600;
-}
-
-.offcanvas .navbar-nav .nav-link {
-    padding: 0.75rem 1rem;
-    border-radius: 8px;
-    margin: 0.25rem 0;
-}
-
-/* Estilos para el botón del toggler */
-.navbar-toggler {
-    border: none;
-    padding: 0.25rem;
-}
-
-.navbar-toggler:focus {
-    box-shadow: none;
-    outline: none;
-}
-
-/* Ajustes adicionales para el contenedor del navbar */
+/* Contenedores */
 .container-fluid {
     padding-left: 1rem;
     padding-right: 1rem;
 }
 
-/* Estilo para el desvanecimiento del mensaje de alerta */
-.fade-out {
+/* Sobre Nosotros Section */
+.about-section {
+    padding: 8rem 0;
+    background-color: var(--color-fondo);
+    margin-top: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Animación de aparición al scroll */
+.scroll-reveal {
     opacity: 0;
-    transition: opacity 0.5s ease-out;
+    transform: translateY(30px);
+    transition: all 0.8s ease-out;
+}
+
+.scroll-reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Retraso en la animación para elementos consecutivos */
+.about-content.scroll-reveal {
+    transition-delay: 0.2s;
+}
+
+.about-image {
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.about-image img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.about-image:hover img {
+    transform: scale(1.05);
+}
+
+/* Efecto de fondo decorativo */
+.about-section::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        45deg,
+        rgba(var(--color-primario-rgb), 0.03) 0%,
+        rgba(var(--color-primario-rgb), 0) 100%
+    );
+    transform: rotate(-3deg);
+    z-index: 0;
+}
+
+.about-content {
+    padding: 2rem;
+    position: relative;
+    z-index: 1;
+}
+
+.about-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--color-texto);
+    margin-bottom: 1rem;
+    position: relative;
+}
+
+.about-title::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 0;
+    width: 60px;
+    height: 3px;
+    background-color: var(--color-primario);
+    transition: width 0.3s ease;
+}
+
+.about-content:hover .about-title::after {
+    width: 100px;
+}
+
+.about-subtitle {
+    color: var(--color-primario);
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 2px;
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+}
+
+.about-text {
+    color: var(--color-texto);
+    font-size: 1rem;
+    line-height: 1.8;
+}
+
+.about-text p {
+    margin-bottom: 1.5rem;
+    opacity: 0.9;
+}
+
+/* Media Queries */
+@media (max-width: 991.98px) {
+    .navbar-custom .navbar-collapse {
+        margin-top: 1rem;
+    }
+    
+    .navbar-custom .navbar-nav {
+        margin-bottom: 1rem;
+    }
+    
+    .navbar-custom .d-flex {
+        flex-direction: column;
+    }
+    
+    .navbar-custom .form-control {
+        margin-bottom: 0.5rem;
+    }
+    
+    .navbar-custom .btn {
+        width: 100%;
+    }
+    
+    .carousel-container {
+        margin: 0 10px 6rem 10px; /* Ajustado el margin-bottom */
+    }
+
+    .carousel-img {
+        height: 300px;
+    }
+
+    .carousel-control-prev,
+    .carousel-control-next {
+        width: 8%;
+    }
+
+    .carousel-caption {
+        width: 90%;
+        padding: 0.75rem;
+        font-size: 0.9rem;
+    }
+
+    .about-section {
+        padding: 6rem 0;
+        margin-top: 3rem;
+    }
+
+    .about-content {
+        padding: 2rem 1rem;
+    }
+
+    .about-title {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .navbar-logo {
+        height: 50px;
+    }
+    
+    .navbar-custom .navbar-brand {
+        font-size: 1.2rem;
+    }
+    
+    .card-img-top {
+        height: 180px;
+    }
+    
+    .form-container {
+        margin: 1rem;
+        padding: 1.5rem;
+    }
+
+    .carousel-caption {
+        width: 95%;
+        padding: 0.5rem;
+        font-size: 0.85rem;
+    }
+
+    .about-section {
+        padding: 4rem 0;
+        margin-top: 2rem;
+    }
+
+    .about-image {
+        margin-bottom: 2rem;
+    }
+
+    .about-content {
+        text-align: center;
+    }
+
+    .about-title {
+        font-size: 1.8rem;
+    }
+
+    .about-title::after {
+        left: 50%;
+        transform: translateX(-50%);
+    }
+}
+
+@media (max-width: 576px) {
+    .carousel-img {
+        height: 250px;
+    }
+
+    .container-fluid {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+
+    .card {
+        margin: 0.5rem;
+    }
+
+    .carousel-caption {
+        bottom: 10px;
+        width: 100%;
+        border-radius: 0;
+    }
+
+    .carousel-container {
+        margin: 0 10px 4rem 10px; /* Ajustado el margin-bottom */
+    }
 }

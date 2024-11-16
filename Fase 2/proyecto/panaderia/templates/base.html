@@ -17,84 +17,153 @@
 <form method="POST" action="/base/">
   {% csrf_token %} 
 <body>
-   <!-- Navbar principal -->
-   <nav class="navbar navbar-expand-lg navbar-custom">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="#">
-            <img src="{% static 'img/Logo.png' %}" alt="Logo" class="navbar-logo">
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" 
-                data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <!-- Menú principal (visible en pantallas grandes) -->
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav me-auto">
-                <li class="nav-item">
-                    <a class="nav-link active" href="#">Inicio</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Productos</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Sobre Nosotros</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="contacto.html">Contacto</a>
-                </li>
-
-                {% if user.is_authenticated %}
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'salir' %}">Cerrar sesion</a>
-                </li>
-                {% else %}
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'login' %}">Iniciar sesion</a>
-                </li>
-                {% endif %}
+    
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container-fluid">
+            <!-- Logo -->
+            <a class="navbar-brand" href="base.html">
+                <img src="{% static 'img/Logo.png' %}" alt="Logo" class="navbar-logo">
+            </a>
+            
+            <!-- Botón hamburguesa -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" 
+                    data-bs-target="#navbarContent" aria-controls="navbarContent" 
+                    aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+    
+            <!-- Contenido del navbar -->
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="base.html">Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="mostrar_productos.html">Productos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="sobrenosotros.html">Sobre Nosotros</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="contacto.html">Contacto</a>
+                    </li>
+                    {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'salir' %}">Cerrar sesión</a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}">Iniciar sesión</a>
+                    </li>
+                    {% endif %}
+                </ul>
+                
+                <!-- Formulario de búsqueda -->
+                <form class="d-flex" role="search">
+                    <input class="form-control me-2" type="search" placeholder="Buscar" aria-label="Search">
+                    <button class="btn button" type="submit">Buscar</button>
+                </form>
             </div>
-            </ul>
-            <form class="d-flex" role="search">
-                <input class="form-control me-2" type="search" placeholder="Buscar" aria-label="Search">
-                <button class="btn button" type="submit">Buscar</button>
-            </form>
         </div>
-       
-</nav>
+    </nav>
 
-<!-- Sidebar (offcanvas) para móviles -->
-<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
-    <div class="offcanvas-header">
-        <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Menú</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    {% load static %}
+
+    <div class="container mt-3">
+        {% if cliente %}
+        <h2>Bienvenido, {{ cliente.nombre_completo }}</h2>
+        {% else %}
+        <h2>Bienvenido, visitante</h2>
+        {% endif %}
+      </div>
+
+    <div class="container mt-4">
+        <div id="carouselExampleAutoplaying" class="carousel slide carousel-container" data-bs-ride="carousel">
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <div class="position-relative">
+                        <img src="{% static 'img\Marraqueta.png' %}" class="d-block carousel-img" alt="Marraquetas recien horneadas con una corteza bien crujiente, especial para la once">
+                        <div class="carousel-caption d-none d-md-block">
+                            <p class="bg-dark bg-opacity-50 p-2 rounded">Marraquetas recien horneadas con una corteza bien crujiente, especial para la once</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <div class="position-relative">
+                        <img src="{% static 'img\Pie de Limon.png' %}" class="d-block carousel-img" alt="Tarta de limón con una textura suave y un sabor intenso, especial para compartir">
+                        <div class="carousel-caption d-none d-md-block">
+                            <p class="bg-dark bg-opacity-50 p-2 rounded">Tarta de limón con una textura suave y un sabor intenso, especial para compartir</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <div class="position-relative">
+                        <img src="{% static 'img\Brazo de Reina.png' %}" class="d-block carousel-img" alt="Bizcocho rico para acompañar cualquier momento del desayuno u once">
+                        <div class="carousel-caption d-none d-md-block">
+                            <p class="bg-dark bg-opacity-50 p-2 rounded">Bizcocho rico para acompañar cualquier momento del desayuno u once</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
     </div>
-    <div class="offcanvas-body">
-        <ul class="navbar-nav">
-            <li class="nav-item">
-                <a class="nav-link active" href="#">Inicio</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="lista_productos.html">Productos</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="contacto">Contacto</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/Login/">Iniciar Sesion</a>
-            </li>
-        </ul>
-        <form class="d-flex mt-3">
-            <input class="form-control" type="search" placeholder="Buscar" aria-label="Buscar">
-        </form>
-        
+
+    <div class="container about-section fade-in-section">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <div class="about-image scroll-reveal">
+                    <img src="{% static 'img/Panadera.jpg' %}" alt="Elegante mesa con flores y copas" class="img-fluid">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="about-content scroll-reveal">
+                    <h2 class="about-title">About Us</h2>
+                    <div class="about-subtitle">RESTAURANT STYLE</div>
+                    <div class="about-text">
+                        <p>Sed commodo augue eu diam tincidunt, sit amet auctor lectus semper. Mauris porttitor diam at fringilla tempor. Integer molestie rhoncus nisi a euismod. Etiam scelerisque eu enim et vestibulum.</p>
+                        <p>Mauris finibus, eros a faucibus varius, dui risus mattis massa, sed lobortis ante ante eget justo. Nam eu dolor lorem. Praesent blandit leo sit amet velit accumsan ultrices. Vestibulum nec libero vel sapien dictum euismod eu ac justo.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-</div>  
  
 <footer class="footer">
   <p>&copy; 2023 Arte en Masa. Todos los derechos reservados.</p>
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.1
+        };
+    
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+    
+        document.querySelectorAll('.scroll-reveal').forEach(element => {
+            observer.observe(element);
+        });
+    });
+    </script>
 {% endblock %}
 </body>
 </html>
