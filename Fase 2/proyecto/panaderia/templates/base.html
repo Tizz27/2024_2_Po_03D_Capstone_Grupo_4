@@ -7,11 +7,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     
 
     
-    <title>Document</title>
+    <title>Arte en Masa</title>
 </head>
 {% block contenido %}
 <form method="POST" action="/base/">
@@ -20,154 +21,188 @@
     
     <nav class="navbar navbar-expand-lg navbar-custom">
         <div class="container-fluid">
-            <!-- Logo -->
-            <a class="navbar-brand" href="base.html">
-                <img src="{% static 'img/Logo.png' %}" alt="Logo" class="navbar-logo">
-            </a>
-            
-            <!-- Botón hamburguesa -->
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" 
-                    data-bs-target="#navbarContent" aria-controls="navbarContent" 
-                    aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-    
-            <!-- Contenido del navbar -->
-            <div class="collapse navbar-collapse" id="navbarContent">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="{% url 'base' %}">Inicio</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/productos/">Productos</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="sobrenosotros.html">Sobre Nosotros</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="contacto.html">Contacto</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'ver_carrito' %}">Ver Carrito</a>
-                    </li>
-                    {% if is_logged_in %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'cerrar' %}">Cerrar sesion</a>
-                    </li>
-                    {% else %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'login1' %}">Iniciar sesion</a>
-                    </li>
-                    {% endif %}
-                    
-                </ul>
-                
-                <!-- Formulario de búsqueda -->
-                <form class="d-flex" role="search">
-                    <input class="form-control me-2" type="search" placeholder="Buscar" aria-label="Search">
-                    <button class="btn button" type="submit">Buscar</button>
-                </form>
-            </div>
+          <a class="navbar-brand" href="base.html">
+            <img src="{% static 'img/Logo.png' %}" class="navbar-logo" alt="Logo">
+          </a>
+          
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+      
+          <div class="collapse navbar-collapse" id="navbarContent">
+            <!-- Links principales del menú -->
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                <a class="nav-link active" href="{% url 'base' %}">Inicio</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/productos/">Productos</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/contacto/">Contacto</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'ver_carrito' %}">
+                    <i class="fas fa-shopping-cart"></i>
+                </a>
+              </li>
+            </ul>
+      
+            <!-- Barra de búsqueda -->
+            <form class="d-flex me-3">
+              <div class="search-container">
+                <input class="form-control" type="search" placeholder="Buscar" aria-label="Buscar">
+                <button class="btn btn-primary" type="submit">Buscar</button>
+              </div>
+            </form>
+      
+            <!-- Links de sesión -->
+            <ul class="navbar-nav">
+              {% if is_logged_in %}
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'cerrar' %}">Cerrar sesión</a>
+              </li>
+              {% else %}
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'login1' %}">Iniciar sesión</a>
+              </li>
+              {% endif %}
+            </ul>
+          </div>
         </div>
-    </nav>
-
-    {% load static %}
-
-    <div class="container mt-3">
+      </nav>
+      
+      <div class="welcome-message">
         {% if cliente %}
         <h2>Bienvenido, {{ cliente.nombre_completo }}</h2>
         {% else %}
-        <h2>Bienvenido, visitante</h2>
+        <h2>Bienvenido</h2>
         {% endif %}
       </div>
-
-    <div class="container mt-4">
-        <div id="carouselExampleAutoplaying" class="carousel slide carousel-container" data-bs-ride="carousel">
-            <div class="carousel-inner">
-                <div class="carousel-item active">
-                    <div class="position-relative">
-                        <img src="{% static 'img\Marraqueta.png' %}" class="d-block carousel-img" alt="Marraquetas recien horneadas con una corteza bien crujiente, especial para la once">
-                        <div class="carousel-caption d-none d-md-block">
-                            <p class="bg-dark bg-opacity-50 p-2 rounded">Marraquetas recien horneadas con una corteza bien crujiente, especial para la once</p>
-                        </div>
-                    </div>
+      
+      <!-- Carrusel -->
+      <div class="container mt-4">
+        <div id="carouselExampleAutoplaying" class="carousel slide carousel-container" bs-ride="carousel">
+          <div class="carousel-inner">
+            <div class="carousel-item active">
+              <div class="position-relative">
+                <img src="{% static 'img\Marraqueta.png' %}" class="d-block carousel-img" alt="Marraquetas recien horneadas con una corteza bien crujiente, especial para la once">
+                <div class="carousel-caption d-none d-md-block">
+                  Marraquetas recien horneadas con una corteza bien crujiente, especial para la once
                 </div>
-                <div class="carousel-item">
-                    <div class="position-relative">
-                        <img src="{% static 'img\Pie de Limon.png' %}" class="d-block carousel-img" alt="Tarta de limón con una textura suave y un sabor intenso, especial para compartir">
-                        <div class="carousel-caption d-none d-md-block">
-                            <p class="bg-dark bg-opacity-50 p-2 rounded">Tarta de limón con una textura suave y un sabor intenso, especial para compartir</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="carousel-item">
-                    <div class="position-relative">
-                        <img src="{% static 'img\Brazo de Reina.png' %}" class="d-block carousel-img" alt="Bizcocho rico para acompañar cualquier momento del desayuno u once">
-                        <div class="carousel-caption d-none d-md-block">
-                            <p class="bg-dark bg-opacity-50 p-2 rounded">Bizcocho rico para acompañar cualquier momento del desayuno u once</p>
-                        </div>
-                    </div>
-                </div>
+              </div>
             </div>
-            
-            <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Previous</span>
-            </button>
-            <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Next</span>
-            </button>
+            <div class="carousel-item">
+              <div class="position-relative">
+                <img src="{% static 'img\Pie de Limon.png' %}" class="d-block carousel-img" alt="Tarta de limón con una textura suave y un sabor intenso, especial para compartir">
+                <div class="carousel-caption d-none d-md-block">
+                  Tarta de limón con una textura suave y un sabor intenso, especial para compartir
+                </div>
+              </div>
+            </div>
+            <div class="carousel-item">
+              <div class="position-relative">
+                <img src="{% static 'img\Brazo de Reina.png' %}" class="d-block carousel-img" alt="Bizcocho rico para acompañar cualquier momento del desayuno u once">
+                <div class="carousel-caption d-none d-md-block">
+                  Bizcocho rico para acompañar cualquier momento del desayuno u once
+                </div>
+              </div>
+            </div>
+          </div>
+          <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+          </button>
         </div>
-    </div>
-
-    <div class="container about-section fade-in-section">
+      </div>
+      
+      <!-- Sobre Nosotros -->
+      <div class="container about-section fade-in-section">
         <div class="row align-items-center">
-            <div class="col-md-6">
-                <div class="about-image scroll-reveal">
-                    <img src="{% static 'img/Panadera.jpg' %}" alt="Elegante mesa con flores y copas" class="img-fluid">
-                </div>
+          <div class="col-md-6">
+            <div class="about-image scroll-reveal">
+              <img src="{% static 'img/Panadera.jpg' %}" class="img-fluid" alt="Elegante mesa con flores y copas">
             </div>
-            <div class="col-md-6">
-                <div class="about-content scroll-reveal">
-                    <h2 class="about-title">About Us</h2>
-                    <div class="about-subtitle">RESTAURANT STYLE</div>
-                    <div class="about-text">
-                        <p>Sed commodo augue eu diam tincidunt, sit amet auctor lectus semper. Mauris porttitor diam at fringilla tempor. Integer molestie rhoncus nisi a euismod. Etiam scelerisque eu enim et vestibulum.</p>
-                        <p>Mauris finibus, eros a faucibus varius, dui risus mattis massa, sed lobortis ante ante eget justo. Nam eu dolor lorem. Praesent blandit leo sit amet velit accumsan ultrices. Vestibulum nec libero vel sapien dictum euismod eu ac justo.</p>
-                    </div>
-                </div>
+          </div>
+          <div class="col-md-6">
+            <div class="about-content scroll-reveal">
+              <h2 class="about-title">Sobre Nosotros</h2>
+              <div class="about-subtitle">Negocio Familiar</div>
+              <div class="about-text">
+                <p>Somos una panadería y pastelería familiar con más de 10 años de historia. Desde nuestros inicios, nos hemos dedicado a crear productos frescos y de alta calidad, manteniendo vivas las recetas tradicionales que tanto nos apasionan.</p>
+                <p>Nuestro compromiso es ofrecerte siempre lo mejor, desde el pan recién horneado hasta los pasteles más deliciosos. A lo largo de los años, hemos crecido junto a nuestra comunidad, sin dejar de lado el toque casero y familiar que nos distingue.</p>
+                <p>Nos encanta innovar y sorprender a nuestros clientes con nuevas recetas, manteniendo la esencia que nos ha acompañado desde el primer día.</p>
+                <p>¡Te esperamos en nuestra tienda para compartir el sabor y la calidad que nos han convertido en un clásico de la zona!</p>
+              </div>
             </div>
+          </div>
         </div>
-    </div>
- 
-<footer class="footer">
-  <p>&copy; 2023 Arte en Masa. Todos los derechos reservados.</p>
-</footer>
+      </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const observerOptions = {
-            root: null,
-            rootMargin: '0px',
-            threshold: 0.1
-        };
+      <div class="contact-section scroll-reveal">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-4 contact-item">
+              <h3 class="contact-title">Contacto</h3>
+              <div class="contact-content">
+                <div class="contact-detail">
+                  <p>Telefono</p>
+                  <p>+56932659812</p>
+                </div>
+                <div class="contact-detail">
+                  <p>Nuestra Direccion</p>
+                  <p>Av. Vicuña Mackenna 1128, Peñaflor, Chile</p>
+                  <p>San Martín 392, Talagante, Chile</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4 contact-item">
+              <h3 class="contact-title">Horario de Atencion</h3>
+              <div class="contact-content">
+                <div class="hours-detail">
+                  <p>Lunes-Viernes</p>
+                  <p>9:00 AM - 8:00 PM</p>
+                </div>
+                <div class="hours-detail">
+                  <p>Sabado</p>
+                  <p>10:30 AM - 10:00 PM</p>
+                </div>
+                <div class="hours-detail">
+                  <p>Domingo</p>
+                  <p>11:30 AM - 10:00 PM</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4 contact-item">
+              <h3 class="contact-title">Siguenos</h3>
+              <div class="social-links">
+                <a href="https://www.facebook.com/" class="social-link">
+                    <i class="fab fa-facebook-f"></i>
+                </a>
+                <a href="https://www.instagram.com/" class="social-link">
+                    <i class="fab fa-instagram"></i>
+                </a>
+                <a href="https://x.com/" class="social-link">
+                    <i class="fab fa-x-twitter"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer class="footer">
+        <p>© 2024 Arte en Masa. Todos los derechos reservados.</p>
+      </footer>
+
+    {% endblock %}
     
-        const observer = new IntersectionObserver((entries, observer) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('is-visible');
-                    observer.unobserve(entry.target);
-                }
-            });
-        }, observerOptions);
-    
-        document.querySelectorAll('.scroll-reveal').forEach(element => {
-            observer.observe(element);
-        });
-    });
-    </script>
-{% endblock %}
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'js/animaciones.js' %}"></script>
 </body>
 </html>
