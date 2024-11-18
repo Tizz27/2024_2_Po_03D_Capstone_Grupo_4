@@ -2,30 +2,45 @@
 {% load static %}
 
 {% block contenido %}
-{% load crispy_forms_tags%}
-<br>
-<br>
-<br>
+{% load crispy_forms_tags %}
 
-<div class="container-fluid col-md-6 offset-md-3" style="background-color:rgba(255, 255, 255, 0.477);">
-    <div class="row mb-5">
-        <br>
-        <div class="text-center">
-            <br>
-            <h3>Editar Producto</h3>
-        </div>        
+<!-- Fondo con degradado detrás del body -->
+<body style="background: linear-gradient(135deg, #E8D7E3, #F8D6C2, #D6CFE4, #FFF);">
+
+    <!-- Contenedor del formulario -->
+    <div class="container-fluid col-md-6 offset-md-3" style="padding: 30px;">
+        <div class="row mb-5">
+           
+            <!-- Card de formulario en blanco -->
+            <div class="card" style="background-color: #FFF; border-radius: 10px; padding: 30px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);">
+                <div class="text-center mb-4">
+                    <h3 style="font-family: 'Dancing Script', cursive; color: #5A3D2E;">Editar Producto</h3>
+                </div>        
     
-        <form method="POST" enctype="multipart/form-data" onsubmit="return Guardar()">
-            {% csrf_token %} 
-            {{ form | crispy }}
+                <form method="POST" enctype="multipart/form-data" onsubmit="return Guardar()">
+                    {% csrf_token %}
+
+                    <!-- Formulario con estilo crispy -->
+                    {{ form | crispy }}
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <button type="submit" name="Guardar" class="btn" style="background-color: #FFC0A1; border-color: #FFC0A1; color: #5A3D2E; font-size: 1.1rem; padding: 10px 20px; font-weight: bold;">
+                            Guardar
+                        </button>
+
+                        <a href="/gestionproducto/" class="btn" style="background-color: #F8F2F1; color: #5A3D2E; font-size: 1.1rem; padding: 10px 20px; font-weight: bold;">
+                            Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+
             <br>
-            <button type="submit" name="Guardar" class="btn tipo1 flagf float-end button">Guardar</button>
-            <a href="/gestionproducto/" class="btn tipo1 flagf float-end button">Cancelar</a>    
-            <br>
-            <br>    
-        </form>
-      
-{{mensaje}}
-</div>
-</div>
+            <div class="text-center" style="color: #5A3D2E;">
+                {{ mensaje }}
+            </div>
+        </div>
+    </div>
+
+</body>
 {% endblock %}

@@ -1,4 +1,4 @@
-{% load static %}
+{% load static %} 
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -6,153 +6,253 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <style>
         body {
-            background-image: url("{% static 'img/fondo.png' %}");
-            background-size: cover;
-            background-position: center;
+            font-family: 'Roboto', sans-serif;
+            background-color: #F8F2F1;
+            color: #5A3D2E;
         }
 
-        /* Estilo para el título */
-        .titulo-card {
+        /* Navbar */
+        .navbar-custom {
+            background-color: #E8D7E3;
+        }
+
+        .navbar-nav .nav-link {
+            color: #5A3D2E !important;
+        }
+
+        .navbar-nav .nav-link.active {
+            font-weight: bold;
+            text-decoration: underline;
+        }
+
+        .navbar-brand img {
+            height: 40px;
+        }
+
+        /* Hero Section */
+        .hero {
+            background-color: #D6CFE4;
+            height: 80vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #5A3D2E;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero-title {
             font-family: 'Dancing Script', cursive;
-            font-size: 2.5rem;
-            color: white;
-            text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+            font-size: 4rem;
+            color: #5A3D2E;
         }
 
-        /* Card para el título */
-        .titulo-card-container {
-            background-color: rgba(0, 0, 0, 0.6);
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        .hero-button {
+            background-color: #FFC0A1;
+            border-color: #FFC0A1;
+            color: #5A3D2E;
+            font-size: 1.2rem;
+            padding: 10px 20px;
+        }
+
+        .hero-button:hover {
+            background-color: #FFAE87;
+        }
+
+        /* About Section */
+        .about {
+            padding: 4rem 0;
+            background-color: #F8F2F1;
+            text-align: center;
+        }
+
+        .about-title {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            color: #5A3D2E;
+        }
+
+        .about-description {
+            font-size: 1.1rem;
+            color: #5A3D2E;
+            margin-bottom: 2rem;
+        }
+
+        /* Services Section */
+        .services {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            padding: 3rem 0;
+            background-color: #E8D7E3;
+        }
+
+        .service-item {
+            text-align: center;
+        }
+
+        .service-icon {
+            font-size: 3rem;
+            color: #FFC0A1;
+        }
+
+        .service-title {
+            font-size: 1.2rem;
+            margin-top: 0.5rem;
+            color: #5A3D2E;
+        }
+
+        /* Menu Section */
+        .menu {
+            background-color: #FFF;
+            padding: 4rem 0;
+        }
+
+        .menu-title {
+            text-align: center;
+            font-size: 2.5rem;
+            color: #5A3D2E;
+            margin-bottom: 2rem;
+        }
+
+        .menu-items {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+        }
+
+        .menu-card {
+            background-color: #F8F2F1;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .menu-item-title {
+            font-size: 1.2rem;
+            color: #5A3D2E;
+        }
+
+        .menu-item-price {
+            font-size: 1.1rem;
+            color: #5A3D2E;
+            margin-top: 0.5rem;
+        }
+
+        /* Footer */
+        .footer {
+            background-color:  #FFF;
+            color: #5A3D2E;
+            text-align: center;
+            padding: 20px 0;
         }
     </style>
-    
-    <title>Document</title>
-</head>
-{% block contenido %}
-<form method="POST" action="/home/">
-  {% csrf_token %} 
-<body>
-   <!-- Navbar principal -->
-   <nav class="navbar navbar-expand-lg navbar-custom">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="#">
-            <img src="{% static 'img/Logo.png' %}" alt="Logo" class="navbar-logo">
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" 
-                data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav me-auto">
-                <li class="nav-item">
-                    <a class="nav-link active" href="#">Inicio</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Productos</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Sobre Nosotros</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="contacto.html">Contacto</a>
-                </li>
 
-                {% if user.is_authenticated %}
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'salir' %}">Cerrar sesion</a>
-                </li>
-                {% else %}
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'login' %}">Iniciar sesion</a>
-                </li>
-                {% endif %}
+    <title>Panadería Arte en Masa</title>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <img src="{% static 'img/Logo.png' %}" alt="Logo">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <!-- Se agrega la clase mx-auto para centrar las opciones del navbar -->
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/home/">Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Productos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Sobre Nosotros</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Contacto</a>
+                    </li>
+                    {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'salir' %}">Cerrar sesión</a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}">Iniciar sesión</a>
+                    </li>
+                    {% endif %}
+                </ul>
             </div>
-            </ul>
-            <form class="d-flex" role="search">
-                <input class="form-control me-2" type="search" placeholder="Buscar" aria-label="Search">
-                <button class="btn button" type="submit">Buscar</button>
-            </form>
         </div>
     </nav>
-
-<!-- Sidebar (offcanvas) para móviles -->
-<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
-    <div class="offcanvas-header">
-        <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Menú</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-    </div>
-    <div class="offcanvas-body">
-        <ul class="navbar-nav">
-            <li class="nav-item">
-                <a class="nav-link active" href="#">Inicio</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="lista_productos.html">Productos</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="contacto">Contacto</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/Login/">Iniciar Sesion</a>
-            </li>
-        </ul>
-        <form class="d-flex mt-3">
-            <input class="form-control" type="search" placeholder="Buscar" aria-label="Buscar">
-        </form>
-    </div>
-</div>  
-
-  <!-- Contenido dinámico -->
-    <main class="container my-4">
-        <div class="titulo-card-container">
-            <h1 class="titulo-card text-center">Bienvenido al Panel de Administración</h1>
+    
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1 class="hero-title">¡Bienvenido, Administrador!<br> Tu espacio para gestionar la panadería.</h1>
+            <a href="/gestionproducto/" class="btn btn-lg hero-button">Comienza a gestionar</a>
         </div>
-        <div class="row">
-            <div class="col-md-4">
-                <div class="card shadow-sm">
-                    <div class="card-body text-center">
-                        <h5 class="card-title">Inventario</h5>
-                        <p class="card-text">Gestiona los ingredientes y productos disponibles.</p>
-                        <a href="#" class="btn btn-primary">Ir</a>
-                    </div>
-                </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about">
+        <h3 class="menu-title">Tu rol aquí<br> Esencial para el éxito</h3>
+        <p class="about-description">
+            Como administrador, tienes a tu cargo la gestión de productos, pedidos y clientes. Aprovecha todas las herramientas disponibles para asegurar que todo funcione perfectamente.
+        </p>
+    </section>
+
+    <!-- Services Section -->
+    <section class="services">
+        <div class="service-item">
+            <div class="service-icon">📦</div>
+            <h3 class="service-title"><strong>Gestión de productos</strong></h3>
+            <p>Administra los productos con facilidad.</p>
+        </div>
+        <div class="service-item">
+            <div class="service-icon">📝</div>
+            <h3 class="service-title"><strong>Control de pedidos</strong></h3>
+            <p>Sigue el progreso de cada pedido.</p>
+        </div>
+        <div class="service-item">
+            <div class="service-icon">📊</div>
+            <h3 class="service-title"><strong>Reporte de ventas</strong></h3>
+            <p>Obtén informes detallados sobre el rendimiento de tu panadería.</p>
+        </div>
+        <div class="service-item">
+            <div class="service-icon">👥</div>
+            <h3 class="service-title"><strong>Gestión de clientes</strong></h3>
+            <p>Fomenta la relación con los clientes mediante un control eficiente.</p>
+        </div>
+    </section>
+
+    <!-- Menu Section -->
+    <section class="menu">
+        <h2 class="menu-title">Acciones Disponibles</h2>
+        <div class="menu-items">
+            <div class="menu-card">
+                <h3 class="menu-item-title"><strong>Administrar Productos</strong></h3>
+                <p class="menu-item-price">Añadir, editar o eliminar productos.</p>
             </div>
-            <div class="col-md-4">
-                <div class="card shadow-sm">
-                    <div class="card-body text-center">
-                        <h5 class="card-title">Ventas</h5>
-                        <p class="card-text">Consulta las ventas realizadas.</p>
-                        <a href="#" class="btn btn-primary">Ir</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card shadow-sm">
-                    <div class="card-body text-center">
-                        <h5 class="card-title">Empleados</h5>
-                        <p class="card-text">Administra horarios y personal.</p>
-                        <a href="#" class="btn btn-primary">Ir</a>
-                    </div>
-                </div>
+            <div class="menu-card">
+                <h3 class="menu-item-title"><strong>Gestionar Pedidos</strong></h3>
+                <p class="menu-item-price">Ver y actualizar el estado de los pedidos.</p>
             </div>
         </div>
-    </main>
+    </section>
 
-<footer class="footer">
-  <p>&copy; 2023 Arte en Masa. Todos los derechos reservados.</p>
-</footer>
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2024 Arte en Masa. Todos los derechos reservados.</p>
+    </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-{% endblock %}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-
-
-
-

@@ -12,6 +12,7 @@ urlpatterns =[
     path('salir/', salir, name='salir'),
     path('login1/', login_view, name='login1'),
     path('home/', home, name='home'),
+    path('contacto/', contacto, name='contacto'),
     path('cerrar/',cerrar, name='cerrar'), 
     path('agregar_al_carrito/<int:id_producto>/', agregar_al_carrito, name='agregar_al_carrito'),
     path('ver_carrito/',ver_carrito, name='ver_carrito'),

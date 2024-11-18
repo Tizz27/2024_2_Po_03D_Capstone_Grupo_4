@@ -1,48 +1,46 @@
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-    
-
-    
-    <title>Document</title>
-</head>
-
-{% load crispy_forms_tags %}
 
 {% block contenido %}
-<br>
-<body>
-    {% load crispy_forms_tags%}
-    <br>
-    <br>
-    <br>
-    <br>
-    <div class="container-fluid col-md-6 offset-md-3" style="background-color:rgba(255, 255, 255, 0.477);">
+{% load crispy_forms_tags %}
+
+<!-- Fondo con degradado detrás del body -->
+<body style="background: linear-gradient(135deg, #D8B7E8, #B3D9F2, #F3E5D0);">>
+
+    <!-- Contenedor del formulario -->
+    <div class="container-fluid col-md-6 offset-md-3" style="padding: 30px;">
         <div class="row mb-5">
-            <div class="text-center">
-                <br> 
-                        <h2>
-                            Iniciar sesion
-                        </h2>
-                    </div>    
-                        <form action= "" method="POST">
-                            {% csrf_token %}
-                            {{form | crispy}}
-                            <br> 
-                            <button type="submit"  name="Iniciar" class="btn tipo1 flagf float-end button">Iniciar</button>               
-                            <a href="{% url 'base' %}"  class="btn tipo1 flagf float-end button">Cancelar</a>
-                            <br> <br> 
-                            
+           
+            <!-- Card de formulario en blanco -->
+            <div class="card" style="background-color: #FFF; border-radius: 15px; padding: 30px; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);">
+                <div class="text-center mb-4">
+                    <h3 style="font-family: 'Dancing Script', cursive; color: #D48C5A; font-size: 2rem;">Iniciar sesión</h3>
+                </div>        
+    
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <!-- Formulario con estilo crispy -->
+                    {{ form | crispy }}
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <button type="submit" name="Iniciar" class="btn" style="background-color: #D48C5A; border-color: #D48C5A; color: white; font-size: 1.1rem; padding: 10px 20px; font-weight: bold; border-radius: 25px;">
+                            Iniciar
+                        </button>
+
+                        <a href="{% url 'base' %}" class="btn" style="background-color: #F8D6C2; color: #5A4E41; font-size: 1.1rem; padding: 10px 20px; font-weight: bold; border-radius: 25px;">
+                            Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+
+            <br>
+            <div class="text-center" style="color: #5A3D2E;">
+                {{ mensaje }}
+            </div>
         </div>
     </div>
 
 </body>
-
 {% endblock %}

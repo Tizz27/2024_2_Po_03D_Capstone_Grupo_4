@@ -1,54 +1,84 @@
-from django.contrib import messages
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
-from .models import Producto, Cliente,DetallePedido
-from .forms import ProductoForm
-from .forms import ClienteForm
+from .models import Producto, Cliente,DetallePedido, Pedido
+from .forms import ProductoForm,ClienteForm,LoginForm, PedidoForm
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth import logout
-from .forms import LoginForm
-from django.contrib import messages
-
-from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib import messages
 from django.db import transaction
 from decimal import Decimal, InvalidOperation
 
 def ver_carrito(request):
     carrito = {}
-    total = Decimal(0)  # Usamos Decimal para evitar problemas de precisión
-
-    # Si el cliente está autenticado, carga el carrito desde la base de datos
+    total = Decimal(0)
+    direccion_envio = ""
+    email = ""
+    
+    # Verificar si el usuario está autenticado
     if request.user.is_authenticated:
+        cliente = request.user.cliente
+        direccion_envio = cliente.direccion  # Llenamos la dirección
+        email = request.user.email
+
         carrito_items = DetallePedido.objects.filter(pedido__cliente=request.user)
         carrito = {
             item.producto.id_producto: {
                 'nombre': item.producto.nombre_producto,
-                'precio': str(item.precio_unitario),  # Convertimos a string solo al mostrar
+                'precio': str(item.precio_unitario),
                 'cantidad': item.cantidad,
-                'subtotal': str(item.subtotal)  # Convertimos a string solo al mostrar
+                'subtotal': str(item.subtotal)
             }
             for item in carrito_items
         }
-        
-        # Sumar el total con manejo de errores
+
         for item in carrito.values():
             try:
                 total += Decimal(item['subtotal'])
             except InvalidOperation:
-                # Si hay un error de conversión, se ignora ese valor
                 continue
+
     else:
-        # Si no está autenticado, utiliza el carrito de la sesión
         carrito = request.session.get('carrito', {})
         for item in carrito.values():
             try:
                 total += Decimal(item['subtotal'])
             except InvalidOperation:
-                # Si hay un error de conversión, se ignora ese valor
                 continue
 
-    return render(request, 'carrito.html', {'carrito': carrito, 'total': total})
+    if request.method == 'POST':
+        pedido_form = PedidoForm(request.POST, cliente=request.user.cliente)
+        if pedido_form.is_valid():
+            # Guardar el pedido
+            pedido = pedido_form.save(commit=False)
+            pedido.cliente = request.user.cliente
+            pedido.total = total
+            pedido.save()
+
+            # Guardar los detalles del pedido
+            for item in carrito.values():
+                DetallePedido.objects.create(
+                    pedido=pedido,
+                    producto=Producto.objects.get(id_producto=item['id_producto']),
+                    cantidad=item['cantidad'],
+                    precio_unitario=item['precio'],
+                    subtotal=item['subtotal']
+                )
+
+            # Limpiar el carrito de la sesión
+            request.session['carrito'] = {}
+
+            messages.success(request, "Tu pedido ha sido realizado exitosamente.")
+            return redirect('confirmar_pedido')  # Redirigir a una página de confirmación
+    else:
+        pedido_form = PedidoForm()
+
+    return render(request, 'carrito.html', {
+        'carrito': carrito,
+        'total': total,
+        'pedido_form': pedido_form,
+        'direccion_envio': direccion_envio,
+        'email': email
+    })
 
 @transaction.atomic
 def guardar_carrito_bd(cliente, carrito):
@@ -161,6 +191,20 @@ def base(request):
     # Pasamos el cliente y el estado de la sesión al template
     return render(request, 'base.html', {'cliente': cliente, 'is_logged_in': bool(cliente)})
 
+def contacto(request):
+    # Verificamos si el cliente está logueado
+    cliente_id = request.session.get('cliente_id')
+    cliente = None
+    if cliente_id:
+        try:
+            # Obtenemos el cliente desde la base de datos
+            cliente = Cliente.objects.get(id_cliente=cliente_id)
+        except Cliente.DoesNotExist:
+            return redirect('login1')  # Si el cliente no existe, redirigir al login
+
+    # Pasamos el cliente y el estado de la sesión al template
+    return render(request, 'contacto.html', {'cliente': cliente, 'is_logged_in': bool(cliente)})
+
 
 def salir(request):
     logout(request)
@@ -172,11 +216,6 @@ def registrar_cliente(request):
     if request.method == 'POST':
         formulario = ClienteForm(data=request.POST, files=request.FILES)
 
-        # Validar RUT
-        rut = request.POST.get('rut')
-        if not validar_rut(rut):
-            data["mensaje"] = "RUT inválido"
-            return render(request, 'registrar_cliente.html', data)
 
         if formulario.is_valid():
             cliente = formulario.save(commit=False)
@@ -188,9 +227,28 @@ def registrar_cliente(request):
     return render(request, 'registrar_cliente.html', data)
 
 
+
 def gestion(request):
-    listaproductos= Producto.objects.all()
-    return render(request,"gestionproducto.html", {"productos": listaproductos})
+    # Obtener el término de búsqueda
+    query = request.GET.get('q', '')
+    
+    # Filtrar los productos si hay un término de búsqueda
+    if query:
+        productos = Producto.objects.filter(nombre_producto__icontains=query)
+    else:
+        productos = Producto.objects.all()
+    
+    # Contar los productos registrados
+    productos_count = Producto.objects.count()
+
+    # Contar los clientes registrados
+    clientes_count = Cliente.objects.count()
+
+    return render(request, 'gestionproducto.html', {
+        'productos': productos,
+        'productos_count': productos_count,  # Pasamos el conteo de productos
+        'clientes_count': clientes_count
+    })
 
 def home(request):
     return render (request,'home.html')
@@ -211,20 +269,25 @@ def modificar(request, id_producto):
     if request.method == 'POST':
         form = ProductoForm(request.POST, request.FILES, instance=producto)
         if form.is_valid():
+            # Redondear el precio a 0 decimales antes de guardar
+            precio = form.cleaned_data['precio']
+            form.instance.precio = round(precio, 0)
             form.save()
-            return redirect('mostrar_productos')  # Redirige a la lista de productos o a otra página
+            return redirect('/gestionproducto/')  # Redirige a la lista de productos o a otra página
     else:
         form = ProductoForm(instance=producto)
     
-    return render(request, 'modificar.html', {'form': form, 'producto': producto})  
+    return render(request, 'modificar.html', {'form': form, 'producto': producto})
+
     
 def eliminar (request,id_producto):
     productos= get_object_or_404(Producto, id_producto=id_producto)
     productos.delete()
-    return redirect(to="gestionproducto")   
+    return redirect(to="/gestionproducto/")   
 
 def mostrar_productos(request):
-    productos = Producto.objects.all()
+    query = request.GET.get('q', '')  # Capturar el término de búsqueda
+    productos = Producto.objects.filter(nombre_producto__icontains=query) if query else Producto.objects.all()
     cliente_id = request.session.get('cliente_id')
     cliente = None
     if cliente_id:
@@ -234,8 +297,9 @@ def mostrar_productos(request):
         except Cliente.DoesNotExist:
             return redirect('login1')  # Si el cliente no existe, redirigir al login
     # Pasar los productos y cliente al template
-    return render(request, 'mostrar_productos.html', {'productos': productos, 'cliente': cliente, 'is_logged_in': bool(cliente)})
+    return render(request, 'mostrar_productos.html', {'productos': productos, 'query': query, 'cliente': cliente, 'is_logged_in': bool(cliente)})
 
 def cerrar(request):
     logout(request)
     return render (request,'base.html')
+

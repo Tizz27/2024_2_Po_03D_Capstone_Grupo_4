@@ -28,6 +28,7 @@ class Pedido(models.Model):
     estado = models.CharField(max_length=20)
     total = models.DecimalField(max_digits=7, decimal_places=2)
     direccion_envio = models.CharField(max_length=255, blank=True, null=True)
+    fecha_entrega = models.DateField(null=True, blank=True)
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE, related_name='pedidos')
     sucursal = models.ForeignKey(Sucursal, on_delete=models.CASCADE, related_name='pedidos')
 
@@ -51,6 +52,8 @@ class Administrador(models.Model):
     email = models.EmailField(unique=True)
     contraseña = models.CharField(max_length=255)
     cargo = models.CharField(max_length=50, blank=True, null=True)
+    def __str__(self):
+        return self.nombre
 
     class Meta:
         db_table = 'Administrador'
@@ -60,6 +63,8 @@ class Categoria(models.Model):
     nombre_categoria = models.CharField(max_length=200)
     descripcion = models.TextField(blank=True, null=True)  # CLOB se mapea a TextField en Django
     administrador = models.ForeignKey(Administrador, on_delete=models.CASCADE, related_name='categorias')
+    def __str__(self):
+        return self.nombre_categoria 
 
     class Meta:
         db_table = 'Categoria'

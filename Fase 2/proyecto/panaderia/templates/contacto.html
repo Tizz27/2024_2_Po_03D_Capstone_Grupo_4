@@ -19,7 +19,7 @@
         <!-- Links principales del menú -->
         <ul class="navbar-nav me-auto">
           <li class="nav-item">
-            <a class="nav-link active" href="{% url 'base' %}">Inicio</a>
+            <a class="nav-link" href="{% url 'base' %}">Inicio</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="/productos/">Productos</a>
@@ -31,15 +31,7 @@
             <a class="nav-link" href="{% url 'ver_carrito' %}">Ver Carrito</a>
           </li>
         </ul>
-  
-        <!-- Barra de búsqueda -->
-        <form class="d-flex me-3">
-          <div class="search-container">
-            <input class="form-control" type="search" placeholder="Buscar" aria-label="Buscar">
-            <button class="btn btn-primary" type="submit">Buscar</button>
-          </div>
-        </form>
-  
+
         <!-- Links de sesión -->
         <ul class="navbar-nav">
           {% if is_logged_in %}

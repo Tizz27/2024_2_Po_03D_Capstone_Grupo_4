@@ -35,6 +35,7 @@
             {{ form|crispy }}
             <div class="d-flex justify-content-end mt-3">
                 <button type="submit" class="btn tipo1 flagf button me-2">Iniciar</button>
+                <a href="{% url 'registrar_cliente' %}" class="btn tipo1 flagf button">Registra</a>
                 <a href="{% url 'mostrar_productos' %}" class="btn tipo1 flagf button">Cancelar</a>
             </div>
         </form>

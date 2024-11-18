@@ -16,9 +16,9 @@
             {% for key, item in carrito.items %}
             <tr>
                 <td>{{ item.nombre }}</td>
-                <td>${{ item.precio }}</td>
+                <td>${{ item.precio|floatformat:0 }}</td>
                 <td>{{ item.cantidad }}</td>
-                <td>${{ item.subtotal }}</td>
+                <td>${{ item.subtotal|floatformat:0 }}</td>
                 <td>
                     <a href="{% url 'eliminar_del_carrito' key %}" class="btn btn-danger">Eliminar</a>
                 </td>
@@ -26,8 +26,45 @@
             {% endfor %}
         </tbody>
     </table>
-    <h3>Total: ${{ total }}</h3>
-    <a href="#" class="btn btn-success">Proceder al pago</a>
-    <a href="{% url 'mostrar_productos' %}"  class="btn btn-success">Volver</a>
+    <h3>Total: ${{ total|floatformat:0 }}</h3>
+
+    <form method="POST">
+        {% csrf_token %}
+        {{ cliente_form.as_p }}
+
+        <div class="form-group" id="sucursal_group" style="display:none;">
+            <label for="sucursal">Sucursal</label>
+            <select name="sucursal" id="sucursal" class="form-control">
+                <!-- Aquí irían las sucursales disponibles -->
+                <option value="1">Sucursal 1</option>
+                <option value="2">Sucursal 2</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-success">Proceder al pago</button>
+    </form>
+
+    <a href="{% url 'mostrar_productos' %}" class="btn btn-success">Volver</a>
 </div>
+
+<script>
+    document.getElementById('tipo_entrega').addEventListener('change', function () {
+        if (this.value === 'retiro') {
+            document.getElementById('direccion_envio_group').style.display = 'none';
+            document.getElementById('direccion_envio').disabled = true;
+            document.getElementById('sucursal_group').style.display = 'block';
+        } else {
+            document.getElementById('direccion_envio_group').style.display = 'block';
+            document.getElementById('direccion_envio').disabled = false;
+            document.getElementById('sucursal_group').style.display = 'none';
+        }
+    });
+
+    // Inicializar el estado correcto al cargar la página
+    if (document.getElementById('tipo_entrega').value === 'retiro') {
+        document.getElementById('direccion_envio_group').style.display = 'none';
+        document.getElementById('direccion_envio').disabled = true;
+        document.getElementById('sucursal_group').style.display = 'block';
+    }
+</script>
 {% endblock %}

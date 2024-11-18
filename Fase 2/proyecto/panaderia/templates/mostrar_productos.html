@@ -22,7 +22,7 @@
               <a class="nav-link"  href="{% url 'base' %}">Inicio</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link active" href="/productos/">Productos</a>
+              <a class="nav-link" href="/productos/">Productos</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="/contacto/">Contacto</a>
@@ -33,14 +33,6 @@
               </a>
             </li>
         </ul>
-  
-        <!-- Barra de búsqueda -->
-        <form class="d-flex me-3">
-          <div class="search-container">
-            <input class="form-control" type="search" placeholder="Buscar" aria-label="Buscar">
-              <button class="btn btn-primary" type="submit">Buscar</button>
-          </div>
-        </form>
   
         <!-- Links de sesión -->
         <ul class="navbar-nav">
@@ -68,30 +60,39 @@
       </div>
   {% endif %}
 
-  <!-- Bloque de productos -->
-    <div class="container mt-4">
-      <div class="row">
-          <div class="col-md-8">
-            <h2 style="text-align: center">Productos</h2>
-              <div class="row">
-                {% for producto in productos %}
-                    <div class="col-md-4">
-                        <div class="card">
-                            <img src="{{ producto.imagen.url }}" class="card-img-top" alt="{{ producto.nombre_producto }}">
-                            <div class="card-body">
-                                <h5 class="card-title">{{ producto.nombre_producto }}</h5>
-                                <p>{{ producto.descripcion }}</p>
-                                <p>Precio: ${{ producto.precio }}</p>
-                                <p>Stock: {{ producto.stock }}</p>
-                                <a href="{% url 'agregar_al_carrito' producto.id_producto %}" class="btn btn-primary">Agregar al carrito</a>
-                            </div>
-                        </div>
+  <div class="container mt-4">
+    <!-- Formulario de búsqueda -->
+    <form method="get" action="" class="mb-4">
+        <div class="input-group">
+            <input type="text" name="q" class="form-control" placeholder="Buscar productos..." value="{{ query }}">
+            <button class="btn btn-primary" type="submit">Buscar</button>
+        </div>
+    </form>
+    <br>
+
+    <!-- Bloque de productos -->
+    <h2 style="text-align: center">Productos</h2>
+    <br>
+    <div class="row">
+        {% for producto in productos %}
+            <div class="col-md-4">
+                <div class="card">
+                  <img src="{{ producto.imagen.url }}" class="card-img-top" alt="{{ producto.nombre_producto }}" style="max-height: 200px; object-fit: cover;">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ producto.nombre_producto }}</h5>
+                        <p>{{ producto.descripcion }}</p>
+                        <p>Precio: ${{ producto.precio|floatformat:0 }}</p>
+                        <p>Stock: {{ producto.stock }}</p>
+                        <a href="{% url 'agregar_al_carrito' producto.id_producto %}" class="btn btn-primary">Agregar al carrito</a>
                     </div>
-                {% endfor %}
-              </div>
-          </div>
-      </div>
+                </div>
+            </div>
+        {% empty %}
+            <p class="text-center">No se encontraron productos que coincidan con la búsqueda.</p>
+        {% endfor %}
     </div>
+</div>
+
 
 
     <div class="contact-section scroll-reveal">
