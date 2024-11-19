@@ -291,19 +291,19 @@ def salir(request):
     return render (request,'base.html')
 
 def registrar_cliente(request):
-    data = {'form': ClienteForm()}
-
     if request.method == 'POST':
-        formulario = ClienteForm(data=request.POST, files=request.FILES)
+        form = ClienteForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Cliente registrado exitosamente.')
+            return redirect('login1')
+        else:
+            messages.error(request, 'Por favor, corrige los errores del formulario.')
+            
+    else:
+        form = ClienteForm()
 
-        if formulario.is_valid():
-            cliente = formulario.save(commit=False)
-            cliente.contraseña = make_password(cliente.contraseña)
-            cliente.save()
-            data["mensaje"] = "Cliente registrado"
-            return redirect('base')
-
-    return render(request, 'registrar_cliente.html', data)
+    return render(request, 'registrar_cliente.html', {'form': form})
 
 
 

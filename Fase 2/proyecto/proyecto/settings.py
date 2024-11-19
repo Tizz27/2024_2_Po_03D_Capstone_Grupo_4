@@ -31,11 +31,16 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 LOGIN_REDIRECT_URL='home'
-LOGOUT_REDIRECT_URL ='home'
+LOGOUT_REDIRECT_URL ='base'
 LOGIN_URL = '/login1/'  # Ajusta según tu ruta de inicio de sesión
 
 # Application definition
+from django.contrib.messages import constants as messages
 
+MESSAGE_TAGS = {
+    messages.ERROR: 'danger',
+    messages.SUCCESS: 'success',
+}
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',

@@ -33,14 +33,29 @@ class ProductoForm(forms.ModelForm):
         model =Producto
         fields = '__all__'
 
+import datetime
+import re
+
 class ClienteForm(forms.ModelForm):
     class Meta:
         model = Cliente
         fields = ['nombre_completo', 'fecha_nacimiento', 'email', 'contraseña', 'direccion', 'rut']
         widgets = {
-            'fecha_nacimiento': forms.DateInput(attrs={'type': 'date'}),
             'contraseña': forms.PasswordInput(),
+            'fecha_nacimiento': forms.DateInput(attrs={'type': 'date'}),
         }
+
+
+    def clean_fecha_nacimiento(self):
+        fecha_nacimiento = self.cleaned_data.get('fecha_nacimiento')
+        hoy = datetime.date.today()
+        hace_100_anios = hoy.replace(year=hoy.year - 100)
+
+        if fecha_nacimiento > hoy:
+            raise forms.ValidationError("La fecha de nacimiento no puede ser futura.")
+        if fecha_nacimiento < hace_100_anios:
+            raise forms.ValidationError("La fecha de nacimiento no puede ser de hace más de 100 años.")
+        return fecha_nacimiento
 
 class LoginForm(forms.Form):
     email = forms.EmailField()

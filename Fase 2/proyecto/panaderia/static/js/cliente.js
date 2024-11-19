@@ -11,10 +11,16 @@ function validarFormulario() {
         return false;
     }
 
-    if (fechaNacimiento === "") {
-        alert("Fecha de nacimiento no ingresada");
+    // Validar Fecha de Nacimiento
+    if (fechaNacimiento > hoy) {
+        alert('La fecha de nacimiento no puede ser futura.');
         return false;
     }
+    if (fechaNacimiento < hace100Anios) {
+        alert('La fecha de nacimiento no puede ser de hace más de 100 años.');
+        return false;
+    }
+
 
     if (email === "") {
         alert("Correo electrónico no ingresado");
