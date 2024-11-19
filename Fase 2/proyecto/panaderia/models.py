@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 class Cliente(models.Model):
     id_cliente = models.AutoField(primary_key=True)  # AutoField crea un ID auto-incremental
@@ -24,13 +25,13 @@ class Sucursal(models.Model):
 
 class Pedido(models.Model):
     id_pedido = models.AutoField(primary_key=True)
-    fecha_pedido = models.DateField()
+    fecha_pedido = models.DateField(default=timezone.now) 
     estado = models.CharField(max_length=20)
     total = models.DecimalField(max_digits=7, decimal_places=0)
     direccion_envio = models.CharField(max_length=255, blank=True, null=True)
     fecha_entrega = models.DateField(null=True, blank=True)
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE, related_name='pedidos')
-    sucursal = models.ForeignKey(Sucursal, on_delete=models.CASCADE, related_name='pedidos')
+    sucursal = models.ForeignKey(Sucursal, on_delete=models.CASCADE, related_name='pedidos', null=True, blank=True)
     comentarios = models.TextField(blank=True, null=True)
     
 

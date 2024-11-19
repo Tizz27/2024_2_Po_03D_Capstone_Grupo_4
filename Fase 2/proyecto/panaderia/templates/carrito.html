@@ -1,47 +1,149 @@
 {% extends 'base.html' %}
 
 {% block contenido %}
-<div class="container mt-4">
-    <h2>Carrito de Compras</h2>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Producto</th>
-                <th>Precio</th>
-                <th>Cantidad</th>
-                <th>Subtotal</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for key, item in carrito.items %}
-            <tr>
-                <td>{{ item.nombre }}</td>
-                <td>${{ item.precio|floatformat:0 }}</td>
-                <td>{{ item.cantidad }}</td>
-                <td>${{ item.subtotal|floatformat:0 }}</td>
-                <td>
-                    <a href="{% url 'eliminar_del_carrito' key %}" class="btn btn-danger">Eliminar</a>
-                </td>
-            </tr>
+<body style="background: linear-gradient(135deg, #E8D7E3, #F8D6C2, #D6CFE4, #FFF);">
+<br>
+<div class="container-fluid col-md-8 offset-md-2" style="background-color: rgba(255, 255, 255, 0.477);">
+    <div class="row mb-5">
+        <br>
+        <div class="text-center">
+            <h3>Carrito de Compras</h3>
+        </div>  
+        <br>      
+
+        <div class="row">
+            <!-- Columna: Productos en el carrito -->
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h4>Productos en el Carrito</h4>
+                    </div>
+                    <div class="card-body">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Producto</th>
+                                    <th>Precio</th>
+                                    <th>Cantidad</th>
+                                    <th>Subtotal</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for key, item in carrito.items %}
+                                <tr>
+                                    <td>{{ item.nombre }}</td>
+                                    <td>${{ item.precio|floatformat:0 }}</td>
+                                    <td>{{ item.cantidad }}</td>
+                                    <td>${{ item.subtotal|floatformat:0 }}</td>
+                                    <td>
+                                        <a href="{% url 'eliminar_del_carrito' key %}" class="btn btn-danger btn-sm">Eliminar</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="card-footer">
+                        <h5 class="text-end">Total: ${{ total|floatformat:0 }}</h5>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Columna: Detalles del pedido -->
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-success text-white">
+                        <h4>Detalles del Pedido</h4>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" action="{% url 'guardar_pedido' %}">
+                            {% csrf_token %}
+                            
+                            <!-- Correo Electrónico -->
+                            <div class="mb-3">
+                                <label for="email">Correo Electrónico</label>
+                                <input 
+                                    type="email" 
+                                    id="email" 
+                                    name="email" 
+                                    value="{{ pedido_form.initial.email }}"
+                                    class="form-control" 
+                                    {% if cliente %} readonly {% endif %} 
+                                    required>
+                            </div>
+
+                            <!-- Dirección de Envío -->
+                            <div class="mb-3">
+                                <label for="direccion_envio">Dirección de Envío</label>
+                                <input 
+                                    type="text" 
+                                    id="direccion_envio" 
+                                    name="direccion_envio" 
+                                    value="{{ pedido_form.initial.direccion_envio }}" 
+                                    class="form-control" 
+                                    {% if not cliente %} required {% endif %}>
+                            </div>
+
+                            <!-- Selección de Sucursal -->
+                            <div class="mb-3">
+                                <label for="sucursal">Sucursal</label>
+                                <select id="sucursal" name="sucursal" class="form-control">
+                                    <option value="">Seleccione una sucursal</option>
+                                    {% for sucursal in sucursales %}
+                                    <option value="{{ sucursal.id_sucursal }}">
+                                        {{ sucursal.nombre }} - {{ sucursal.direccion }}, {{ sucursal.ciudad }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <!-- Fecha de Entrega -->
+                            <div class="mb-3">
+                                <label for="fecha_entrega">Fecha de Entrega</label>
+                                <input 
+                                    type="date" 
+                                    id="fecha_entrega" 
+                                    name="fecha_entrega" 
+                                    value="{{ pedido_form.initial.fecha_entrega }}" 
+                                    class="form-control" 
+                                    required>
+                            </div>
+
+                            <!-- Comentarios -->
+                            <div class="mb-3">
+                                <label for="comentarios">Comentarios</label>
+                                <textarea 
+                                    id="comentarios" 
+                                    name="comentarios" 
+                                    class="form-control" 
+                                    rows="3">{{ pedido_form.initial.comentarios }}</textarea>
+                            </div>
+
+                            <!-- Campo oculto para el total -->
+                            <input type="hidden" name="total" value="{{ total }}">
+
+                            <!-- Botones -->
+                            <div class="d-flex justify-content-between mt-3">
+                                <a href="{% url 'mostrar_productos' %}" class="btn btn-secondary">Volver a los productos</a>
+                                <button type="submit" class="btn btn-success">Guardar Pedido</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mensajes del sistema -->
+        {% if messages %}
+        <div class="mt-4">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
             {% endfor %}
-        </tbody>
-    </table>
-
-    <h3>Total: ${{ total|floatformat:0 }}</h3>
-
-    <!-- Formulario para detalles del pedido -->
-    <form method="POST">
-        {% csrf_token %}
-        
-        <h4>Detalles del Pedido</h4>
-        
-        <!-- Formulario de Pedido -->
-        {{ pedido_form.as_p }}  <!-- Formulario de detalles del pedido -->
-
-        <button type="submit" class="btn btn-success">Proceder al pago</button>
-    </form>
-
-    <a href="{% url 'mostrar_productos' %}" class="btn btn-success">Volver a los productos</a>
+        </div>
+        {% endif %}
+    </div>
 </div>
 {% endblock %}

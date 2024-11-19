@@ -2,17 +2,17 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from .models import Producto
-from .models import Cliente, Sucursal
+from .models import Cliente
 from .models import Pedido, DetallePedido
 
 class PedidoForm(forms.ModelForm):
     class Meta:
         model = Pedido
-        fields = ['direccion_envio', 'fecha_entrega','comentarios']
+        fields = [ 'estado', 'direccion_envio', 'fecha_entrega', 'comentarios', 'sucursal', 'total', 'cliente']
         widgets = {
             'fecha_entrega': forms.DateInput(attrs={'type': 'date'}),
-            
         }
+
 
 class DetallePedidoForm(forms.ModelForm):
     class Meta:

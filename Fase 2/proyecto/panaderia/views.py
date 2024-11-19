@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
-from .models import Producto, Cliente,DetallePedido, Pedido
+from .models import Producto, Cliente,DetallePedido, Pedido, Sucursal
 from .forms import ProductoForm,ClienteForm,LoginForm, PedidoForm
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth import logout
@@ -8,39 +8,118 @@ from django.contrib import messages
 from django.db import transaction
 from decimal import Decimal, InvalidOperation
 from django.contrib.sessions.models import Session
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseBadRequest
 
-def ver_carrito(request):
-    carrito = {}
-    total = Decimal(0)
-    
-    # Cargar los productos del carrito
-    if request.session.get('carrito'):
-        carrito = request.session['carrito']
-        for item in carrito.values():
-            try:
-                total += Decimal(item['subtotal'])
-            except InvalidOperation:
-                continue
-    
-    # Si el cliente está logueado, obtén los datos del cliente
+
+
+def guardar_pedido(request):
+    # Obtener el carrito de la sesión
+    carrito = request.session.get('carrito', {})
+    sucursales = Sucursal.objects.all()  # Obtener todas las sucursales
+
+    if not carrito:
+        messages.error(request, "El carrito está vacío. No se puede proceder con el pedido.")
+        return redirect('ver_carrito')
+
     cliente = None
     if 'cliente_id' in request.session:
-        cliente = Cliente.objects.get(id_cliente=request.session['cliente_id'])
-    
-    # Si el formulario es POST, procesamos el pedido
+        cliente = Cliente.objects.filter(id_cliente=request.session['cliente_id']).first()
+
     if request.method == 'POST':
-        # Si el cliente está logueado, no necesitamos que complete el formulario de cliente
-        if cliente:
-            pedido_form = PedidoForm(request.POST)
-        else:
-            pedido_form = PedidoForm(request.POST)
-        
+        pedido_form = PedidoForm(request.POST)
+
         if pedido_form.is_valid():
-            # Guardar el pedido
+            # Crear el pedido sin guardarlo
             pedido = pedido_form.save(commit=False)
-            if cliente:
-                pedido.cliente = cliente  # Relacionar el cliente con el pedido
-            pedido.total = total  # Asignar el total calculado del carrito
+            pedido.cliente = cliente
+
+            # Verificar dirección o sucursal
+            direccion_envio = request.POST.get('direccion_envio')
+            sucursal_id = request.POST.get('sucursal')
+
+            if not direccion_envio and not sucursal_id:
+                messages.error(request, "Debes proporcionar una dirección de envío o seleccionar una sucursal.")
+                return redirect('ver_carrito')
+
+            # Asignar sucursal si fue seleccionada
+            if sucursal_id:
+                pedido.sucursal = Sucursal.objects.get(id_sucursal=sucursal_id)
+
+            # Calcular y asignar el total del pedido
+            total = request.POST.get('total')
+            pedido.total = total
+            pedido.save()
+
+            # Crear detalles del pedido
+            for key, item in carrito.items():
+                producto = Producto.objects.get(pk=key)
+                DetallePedido.objects.create(
+                    pedido=pedido,
+                    producto=producto,
+                    cantidad=item['cantidad'],
+                    precio_unitario=item['precio'],
+                    subtotal=item['subtotal']
+                )
+
+            # Limpiar el carrito
+            request.session['carrito'] = {}
+            messages.success(request, "¡Pedido realizado con éxito!")
+            return redirect('mostrar_productos')
+        else:
+            messages.error(request, "Error al guardar el pedido. Verifica la información.")
+    else:
+        pedido_form = PedidoForm()
+
+    return render(request, 'carrito.html', {
+        'carrito': carrito,
+        'total': sum(float(item['subtotal']) for item in carrito.values()),
+        'pedido_form': pedido_form,
+        'sucursales': sucursales,
+        'cliente': cliente,
+    })
+
+
+def ver_carrito(request):
+    carrito = request.session.get('carrito', {})
+    total = sum(float(item['subtotal']) for item in carrito.values())
+
+    # Verificar si el cliente está autenticado
+    cliente_id = request.session.get('cliente_id')
+    cliente = None
+
+    if cliente_id:
+        try:
+            cliente = Cliente.objects.get(id_cliente=cliente_id)
+        except Cliente.DoesNotExist:
+            messages.error(request, "El cliente no existe. Por favor, regístrate o inicia sesión.")
+            return redirect('login1')
+    else:
+        messages.error(request, "Debes iniciar sesión para realizar un pedido.")
+        return redirect('login1')
+
+    # Obtener las sucursales
+    sucursales = Sucursal.objects.all()
+
+    if request.method == 'POST':
+        pedido_form = PedidoForm(request.POST)
+
+        if pedido_form.is_valid():
+            # Crear y guardar el pedido
+            pedido = pedido_form.save(commit=False)
+            pedido.cliente = cliente
+            pedido.total = total
+
+            # Asignar sucursal si está seleccionada
+            sucursal_id = request.POST.get('sucursal')
+            if sucursal_id:
+                try:
+                    sucursal = Sucursal.objects.get(id_sucursal=sucursal_id)
+                    pedido.sucursal = sucursal
+                except Sucursal.DoesNotExist:
+                    messages.error(request, "La sucursal seleccionada no existe.")
+                    return redirect('carrito')
+
             pedido.save()
 
             # Guardar los detalles del pedido
@@ -54,24 +133,25 @@ def ver_carrito(request):
                     subtotal=item['subtotal']
                 )
 
-            # Limpiar el carrito de la sesión
+            # Limpiar el carrito y redirigir
             request.session['carrito'] = {}
+            messages.success(request, "Pedido realizado con éxito.")
+            return redirect('confirmar_pedido')
 
-            messages.success(request, "Tu pedido ha sido realizado exitosamente.")
-            return redirect('confirmar_pedido')  # Redirigir a una página de confirmación
     else:
-        # Si el cliente está logueado, podemos prellenar el formulario de pedido con su información
-        if cliente:
-            pedido_form = PedidoForm(initial={'direccion_envio': cliente.direccion, 'fecha_entrega': None})
-        else:
-            pedido_form = PedidoForm()
+        initial_data = {
+            'direccion_envio': cliente.direccion if cliente else '',
+            'email': cliente.email if cliente else '',
+        }
+        pedido_form = PedidoForm(initial=initial_data)
 
     return render(request, 'carrito.html', {
         'carrito': carrito,
         'total': total,
-        'pedido_form': pedido_form
+        'pedido_form': pedido_form,
+        'sucursales': sucursales,
+        'cliente': cliente,  # Pasar el cliente al template
     })
-
 
 
 # Modificar la función guardar_carrito_bd para manejar un cliente temporal o una sesión
@@ -208,7 +288,7 @@ def contacto(request):
 
 def salir(request):
     logout(request)
-    return render (request,'home.html')
+    return render (request,'base.html')
 
 def registrar_cliente(request):
     data = {'form': ClienteForm()}
@@ -216,13 +296,12 @@ def registrar_cliente(request):
     if request.method == 'POST':
         formulario = ClienteForm(data=request.POST, files=request.FILES)
 
-
         if formulario.is_valid():
             cliente = formulario.save(commit=False)
             cliente.contraseña = make_password(cliente.contraseña)
             cliente.save()
             data["mensaje"] = "Cliente registrado"
-            return redirect('base.html')
+            return redirect('base')
 
     return render(request, 'registrar_cliente.html', data)
 

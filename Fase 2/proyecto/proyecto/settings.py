@@ -32,6 +32,7 @@ ALLOWED_HOSTS = []
 
 LOGIN_REDIRECT_URL='home'
 LOGOUT_REDIRECT_URL ='home'
+LOGIN_URL = '/login1/'  # Ajusta según tu ruta de inicio de sesión
 
 # Application definition
 
