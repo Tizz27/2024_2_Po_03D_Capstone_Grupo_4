@@ -2,175 +2,116 @@
 {% load static %}
 
 {% block contenido %}
-  <form method="POST" action="/mostrar_productos/">
-    {% csrf_token %}
-  
-    <nav class="navbar navbar-expand-lg navbar-custom">
-      <div class="container">
-          <a class="navbar-brand" href="base.html">
-              <img src="{% static 'img/Logo.png' %}" class="navbar-logo" alt="Logo">
+<nav class="navbar navbar-expand-lg navbar-custom">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="{% url 'base' %}">
+      <img src="{% static 'img/Logo.png' %}" class="navbar-logo" alt="Logo">
+    </a>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarContent">
+      <ul class="navbar-nav mx-auto"> 
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'base' %}">Inicio</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/productos/">Productos</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/contacto/">Contacto</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'ver_carrito' %}">
+            <i class="fas fa-shopping-cart"></i>
           </a>
-          
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
-              <span class="navbar-toggler-icon"></span>
-          </button>
-      
-          <div class="collapse navbar-collapse" id="navbarContent">
-              <!-- Links principales del menú -->
-              <ul class="navbar-nav mx-auto"> <!-- mx-auto para centrar los elementos -->
-                  <li class="nav-item">
-                      <a class="nav-link" href="{% url 'base' %}">Inicio</a>
-                  </li>
-                  <li class="nav-item">
-                      <a class="nav-link" href="/productos/">Productos</a>
-                  </li>
-                  <li class="nav-item">
-                      <a class="nav-link" href="/contacto/">Contacto</a>
-                  </li>
-                  <li class="nav-item">
-                      <a class="nav-link" href="{% url 'ver_carrito' %}">
-                          <i class="fas fa-shopping-cart"></i>
-                      </a>
-                  </li>
-              </ul>
-        
-              <!-- Links de sesión -->
-              <ul class="navbar-nav">
-                {% if is_logged_in %}
-                <li class="nav-item">
-                  <a class="nav-link" href="{% url 'cerrar' %}">Cerrar sesión</a>
-                </li>
-                {% else %}
-                <li class="nav-item">
-                  <a class="nav-link" href="{% url 'login1' %}">Iniciar sesión</a>
-                </li>
-                {% endif %}
-              </ul>
-          </div>
-        </div>
-      </nav>
+        </li>
+      </ul>
 
-  {% if messages %}
-      <div class="container mt-3" id="message-container">
-          {% for message in messages %}
-              <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                  {{ message }}
-              </div>
-          {% endfor %}
-      </div>
-  {% endif %}
-
-  <div class="container mt-4">
-    <!-- Formulario de búsqueda -->
-    <form method="get" action="" class="mb-4">
-        <div class="input-group">
-            <input type="text" name="q" class="form-control" placeholder="Buscar productos..." value="{{ query }}">
-            <button class="btn btn-primary" type="submit">Buscar</button>
-        </div>
-    </form>
-    <br>
-
-    <!-- Bloque de productos -->
-    <h2 style="text-align: center">Productos</h2>
-    <br>
-    <div class="row">
-        {% for producto in productos %}
-            <div class="col-md-4">
-                <div class="card">
-                  <img src="{{ producto.imagen.url }}" class="card-img-top" alt="{{ producto.nombre_producto }}" style="max-height: 200px; object-fit: cover;">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ producto.nombre_producto }}</h5>
-                        <p>{{ producto.descripcion }}</p>
-                        <p>Precio: ${{ producto.precio|floatformat:0 }}</p>
-                        <p>Stock: {{ producto.stock }}</p>
-                        <a href="{% url 'agregar_al_carrito' producto.id_producto %}" class="btn btn-primary">Agregar al carrito</a>
-                    </div>
-                </div>
-            </div>
-        {% empty %}
-            <p class="text-center">No se encontraron productos que coincidan con la búsqueda.</p>
-        {% endfor %}
+      <ul class="navbar-nav">
+        {% if is_logged_in %}
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'cerrar' %}">Cerrar sesión</a>
+        </li>
+        {% else %}
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'login1' %}">Iniciar sesión</a>
+        </li>
+        {% endif %}
+      </ul>
     </div>
   </div>
+</nav>
 
+{% if messages %}
+<div class="container mt-3" id="message-container">
+  {% for message in messages %}
+  <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+    {{ message }}
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
 
+<div class="container mt-4">
+  <!-- Formulario de búsqueda -->
+  <form method="get" action="{% url 'mostrar_productos' %}" class="mb-4">
+    <div class="input-group">
+      <input type="text" name="q" class="form-control" placeholder="Buscar productos..." value="{{ query|default:'' }}">
+      <button class="btn btn-primary" type="submit">Buscar</button>
+    </div>
+  </form>
+  <br>
 
-    <div class="contact-section scroll-reveal">
-      <div class="container">
-        <div class="row">
-          <div class="col-md-4 contact-item">
-            <h3 class="contact-title">Contacto</h3>
-            <div class="contact-content">
-              <div class="contact-detail">
-                <p>Telefono</p>
-                <p>+56932659812</p>
-              </div>
-              <div class="contact-detail">
-                <p>Nuestra Direccion</p>
-                <p>Av. Vicuña Mackenna 1128, Peñaflor, Chile</p>
-                <p>San Martín 392, Talagante, Chile</p>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-4 contact-item">
-            <h3 class="contact-title">Horario de Atencion</h3>
-            <div class="contact-content">
-              <div class="hours-detail">
-                <p>Lunes-Viernes</p>
-                <p>9:00 AM - 8:00 PM</p>
-              </div>
-              <div class="hours-detail">
-                <p>Sabado</p>
-                <p>10:30 AM - 10:00 PM</p>
-              </div>
-              <div class="hours-detail">
-                <p>Domingo</p>
-                <p>11:30 AM - 10:00 PM</p>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-4 contact-item">
-            <h3 class="contact-title">Siguenos</h3>
-            <div class="social-links">
-              <a href="https://www.facebook.com/" class="social-link">
-                  <i class="fab fa-facebook-f"></i>
-              </a>
-              <a href="https://www.instagram.com/" class="social-link">
-                  <i class="fab fa-instagram"></i>
-              </a>
-              <a href="https://x.com/" class="social-link">
-                  <i class="fab fa-x-twitter"></i>
-              </a>
-            </div>
-          </div>
+  <!-- Bloque de productos -->
+  <h2 style="text-align: center">Productos</h2>
+  <br>
+  <div class="row">
+    {% for producto in productos %}
+    <div class="col-md-4">
+      <div class="card">
+        <img src="{{ producto.imagen.url }}" class="card-img-top" alt="{{ producto.nombre_producto }}"
+          style="max-height: 200px; object-fit: cover;">
+        <div class="card-body">
+          <h5 class="card-title">{{ producto.nombre_producto }}</h5>
+          <p>{{ producto.descripcion }}</p>
+          <p>Precio: ${{ producto.precio|floatformat:0 }}</p>
+          <p>Stock: {{ producto.stock }}</p>
+          <a href="{% url 'agregar_al_carrito' producto.id_producto %}" class="btn btn-primary">Agregar al carrito</a>
         </div>
       </div>
     </div>
-    
-    <footer class="footer">
-      <p>© 2024 Arte en Masa. Todos los derechos reservados.</p>
-    </footer>
+    {% empty %}
+    <p class="text-center">No se encontraron productos que coincidan con la búsqueda.</p>
+    {% endfor %}
+  </div>
+</div>
 
+<footer class="footer">
+  <p>© 2024 Arte en Masa. Todos los derechos reservados.</p>
+</footer>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{% static 'js/animaciones.js' %}"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const messageContainer = document.getElementById("message-container");
+    if (messageContainer) {
+      setTimeout(() => {
+        messageContainer.classList.add("fade-out");
+      }, 3000);
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="{% static 'js/animaciones.js' %}"></script>
-
-  <script>
-      document.addEventListener("DOMContentLoaded", function() {
-          const messageContainer = document.getElementById("message-container");
-          if (messageContainer) {
-              setTimeout(() => {
-                  messageContainer.classList.add("fade-out");
-              }, 3000); // 3000 ms = 3 segundos
-
-              messageContainer.addEventListener("transitionend", () => {
-                  messageContainer.style.display = "none";
-              });
-          }
+      messageContainer.addEventListener("transitionend", () => {
+        messageContainer.style.display = "none";
       });
-  </script>
-
+    }
+  });
+</script>
 {% endblock %}
-</body>
-</html>
+
+
+
+
+           

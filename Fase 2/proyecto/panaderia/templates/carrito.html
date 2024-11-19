@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+
 {% block contenido %}
 <div class="container mt-4">
     <h2>Carrito de Compras</h2>
@@ -26,45 +27,21 @@
             {% endfor %}
         </tbody>
     </table>
+
     <h3>Total: ${{ total|floatformat:0 }}</h3>
 
+    <!-- Formulario para detalles del pedido -->
     <form method="POST">
         {% csrf_token %}
-        {{ cliente_form.as_p }}
-
-        <div class="form-group" id="sucursal_group" style="display:none;">
-            <label for="sucursal">Sucursal</label>
-            <select name="sucursal" id="sucursal" class="form-control">
-                <!-- Aquí irían las sucursales disponibles -->
-                <option value="1">Sucursal 1</option>
-                <option value="2">Sucursal 2</option>
-            </select>
-        </div>
+        
+        <h4>Detalles del Pedido</h4>
+        
+        <!-- Formulario de Pedido -->
+        {{ pedido_form.as_p }}  <!-- Formulario de detalles del pedido -->
 
         <button type="submit" class="btn btn-success">Proceder al pago</button>
     </form>
 
-    <a href="{% url 'mostrar_productos' %}" class="btn btn-success">Volver</a>
+    <a href="{% url 'mostrar_productos' %}" class="btn btn-success">Volver a los productos</a>
 </div>
-
-<script>
-    document.getElementById('tipo_entrega').addEventListener('change', function () {
-        if (this.value === 'retiro') {
-            document.getElementById('direccion_envio_group').style.display = 'none';
-            document.getElementById('direccion_envio').disabled = true;
-            document.getElementById('sucursal_group').style.display = 'block';
-        } else {
-            document.getElementById('direccion_envio_group').style.display = 'block';
-            document.getElementById('direccion_envio').disabled = false;
-            document.getElementById('sucursal_group').style.display = 'none';
-        }
-    });
-
-    // Inicializar el estado correcto al cargar la página
-    if (document.getElementById('tipo_entrega').value === 'retiro') {
-        document.getElementById('direccion_envio_group').style.display = 'none';
-        document.getElementById('direccion_envio').disabled = true;
-        document.getElementById('sucursal_group').style.display = 'block';
-    }
-</script>
 {% endblock %}

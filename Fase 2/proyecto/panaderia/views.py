@@ -7,58 +7,48 @@ from django.contrib.auth import logout
 from django.contrib import messages
 from django.db import transaction
 from decimal import Decimal, InvalidOperation
+from django.contrib.sessions.models import Session
 
 def ver_carrito(request):
     carrito = {}
     total = Decimal(0)
-    direccion_envio = ""
-    email = ""
     
-    # Verificar si el usuario está autenticado
-    if request.user.is_authenticated:
-        cliente = request.user.cliente
-        direccion_envio = cliente.direccion  # Llenamos la dirección
-        email = request.user.email
-
-        carrito_items = DetallePedido.objects.filter(pedido__cliente=request.user)
-        carrito = {
-            item.producto.id_producto: {
-                'nombre': item.producto.nombre_producto,
-                'precio': str(item.precio_unitario),
-                'cantidad': item.cantidad,
-                'subtotal': str(item.subtotal)
-            }
-            for item in carrito_items
-        }
-
+    # Cargar los productos del carrito
+    if request.session.get('carrito'):
+        carrito = request.session['carrito']
         for item in carrito.values():
             try:
                 total += Decimal(item['subtotal'])
             except InvalidOperation:
                 continue
-
-    else:
-        carrito = request.session.get('carrito', {})
-        for item in carrito.values():
-            try:
-                total += Decimal(item['subtotal'])
-            except InvalidOperation:
-                continue
-
+    
+    # Si el cliente está logueado, obtén los datos del cliente
+    cliente = None
+    if 'cliente_id' in request.session:
+        cliente = Cliente.objects.get(id_cliente=request.session['cliente_id'])
+    
+    # Si el formulario es POST, procesamos el pedido
     if request.method == 'POST':
-        pedido_form = PedidoForm(request.POST, cliente=request.user.cliente)
+        # Si el cliente está logueado, no necesitamos que complete el formulario de cliente
+        if cliente:
+            pedido_form = PedidoForm(request.POST)
+        else:
+            pedido_form = PedidoForm(request.POST)
+        
         if pedido_form.is_valid():
             # Guardar el pedido
             pedido = pedido_form.save(commit=False)
-            pedido.cliente = request.user.cliente
-            pedido.total = total
+            if cliente:
+                pedido.cliente = cliente  # Relacionar el cliente con el pedido
+            pedido.total = total  # Asignar el total calculado del carrito
             pedido.save()
 
             # Guardar los detalles del pedido
             for item in carrito.values():
+                producto = Producto.objects.get(id_producto=item['id_producto'])
                 DetallePedido.objects.create(
                     pedido=pedido,
-                    producto=Producto.objects.get(id_producto=item['id_producto']),
+                    producto=producto,
                     cantidad=item['cantidad'],
                     precio_unitario=item['precio'],
                     subtotal=item['subtotal']
@@ -70,23 +60,32 @@ def ver_carrito(request):
             messages.success(request, "Tu pedido ha sido realizado exitosamente.")
             return redirect('confirmar_pedido')  # Redirigir a una página de confirmación
     else:
-        pedido_form = PedidoForm()
+        # Si el cliente está logueado, podemos prellenar el formulario de pedido con su información
+        if cliente:
+            pedido_form = PedidoForm(initial={'direccion_envio': cliente.direccion, 'fecha_entrega': None})
+        else:
+            pedido_form = PedidoForm()
 
     return render(request, 'carrito.html', {
         'carrito': carrito,
         'total': total,
-        'pedido_form': pedido_form,
-        'direccion_envio': direccion_envio,
-        'email': email
+        'pedido_form': pedido_form
     })
 
+
+
+# Modificar la función guardar_carrito_bd para manejar un cliente temporal o una sesión
 @transaction.atomic
 def guardar_carrito_bd(cliente, carrito):
+    if isinstance(cliente, str):  # Si es un ID de sesión
+        cliente = Session.objects.get(session_key=cliente)  # Obtén el objeto de sesión correspondiente
+        # Aquí puedes almacenar los detalles del pedido asociados con la sesión
+        
     # Guardamos el carrito en la base de datos
     for id_producto, item in carrito.items():
         producto = get_object_or_404(Producto, id_producto=id_producto)
         detalle, created = DetallePedido.objects.update_or_create(
-            pedido__cliente=cliente,  # Vinculamos al cliente
+            pedido__cliente=cliente,  # Vinculamos al cliente (o sesión)
             producto=producto,
             defaults={
                 'cantidad': item['cantidad'],
@@ -94,6 +93,7 @@ def guardar_carrito_bd(cliente, carrito):
                 'subtotal': item['subtotal']
             }
         )
+
 
 # Luego, la vista agregar_al_carrito puede llamar a esta función
 def agregar_al_carrito(request, id_producto):

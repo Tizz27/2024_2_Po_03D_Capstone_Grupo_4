@@ -8,23 +8,11 @@ from .models import Pedido, DetallePedido
 class PedidoForm(forms.ModelForm):
     class Meta:
         model = Pedido
-        fields = ['direccion_envio', 'sucursal', 'fecha_pedido', 'estado', 'cliente']
-
-    direccion_envio = forms.CharField(max_length=255, required=False)
-    sucursal = forms.ModelChoiceField(queryset=Sucursal.objects.all(), required=False)
-    fecha_pedido = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
-    estado = forms.CharField(initial="Pendiente", widget=forms.HiddenInput())
-    cliente = forms.ModelChoiceField(queryset=Cliente.objects.all(), widget=forms.HiddenInput(), required=False)
-    email = forms.EmailField(widget=forms.EmailInput(attrs={'readonly': 'readonly'}), required=False)
-
-    def __init__(self, *args, **kwargs):
-        cliente = kwargs.get('cliente', None)
-        super().__init__(*args, **kwargs)
-        if cliente:
-            # Establecer valores predeterminados para el cliente logueado
-            self.fields['direccion_envio'].initial = cliente.direccion
-            self.fields['email'].initial = cliente.email
-
+        fields = ['direccion_envio', 'fecha_entrega','comentarios']
+        widgets = {
+            'fecha_entrega': forms.DateInput(attrs={'type': 'date'}),
+            
+        }
 
 class DetallePedidoForm(forms.ModelForm):
     class Meta:
@@ -33,6 +21,7 @@ class DetallePedidoForm(forms.ModelForm):
 
     cantidad = forms.IntegerField(min_value=1)
     producto = forms.ModelChoiceField(queryset=Producto.objects.all())
+ 
 class CustomUserCreationForm(UserCreationForm):
     class Meta:
         model= User

@@ -26,11 +26,13 @@ class Pedido(models.Model):
     id_pedido = models.AutoField(primary_key=True)
     fecha_pedido = models.DateField()
     estado = models.CharField(max_length=20)
-    total = models.DecimalField(max_digits=7, decimal_places=2)
+    total = models.DecimalField(max_digits=7, decimal_places=0)
     direccion_envio = models.CharField(max_length=255, blank=True, null=True)
     fecha_entrega = models.DateField(null=True, blank=True)
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE, related_name='pedidos')
     sucursal = models.ForeignKey(Sucursal, on_delete=models.CASCADE, related_name='pedidos')
+    comentarios = models.TextField(blank=True, null=True)
+    
 
     class Meta:
         db_table = 'Pedido'
@@ -38,7 +40,7 @@ class Pedido(models.Model):
 class Pago(models.Model):
     id_pago = models.AutoField(primary_key=True)
     fecha_pago = models.DateField()
-    monto = models.DecimalField(max_digits=7, decimal_places=2)
+    monto = models.DecimalField(max_digits=7, decimal_places=0)
     metodo_pago = models.CharField(max_length=50)
     estado = models.CharField(max_length=20)
     pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE, related_name='pagos')
@@ -85,8 +87,8 @@ class Producto(models.Model):
 class DetallePedido(models.Model):
     id_detalle = models.AutoField(primary_key=True)
     cantidad = models.IntegerField()
-    precio_unitario = models.DecimalField(max_digits=7, decimal_places=2)
-    subtotal = models.DecimalField(max_digits=7, decimal_places=2)
+    precio_unitario = models.DecimalField(max_digits=7, decimal_places=0)
+    subtotal = models.DecimalField(max_digits=7, decimal_places=0)
     pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE, related_name='detalles')
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE, related_name='detalles')
 
