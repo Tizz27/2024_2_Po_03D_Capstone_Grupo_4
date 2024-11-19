@@ -20,7 +20,7 @@
 }
 
 body {
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Comfortaa', sans-serif;
     background-color: var(--color-fondo);
     color: var(--color-texto);
     min-height: 100vh;
@@ -50,11 +50,19 @@ body {
 }
 
 /* Navbar */
-.navbar-custom {
-    background-color: var(--color-secundario);
-    box-shadow: var(--shadow-sm);
-    border-bottom: 1px solid rgba(139, 94, 60, 0.1);
-    padding: 0.5rem 1rem;
+.navbar-custom { 
+    background-color: var(--color-secundario); 
+    box-shadow: var(--shadow-sm); 
+    border-bottom: 1px solid rgba(139, 94, 60, 0.1); 
+    padding: 0.5rem 1rem; 
+    display: flex; 
+    justify-content: center;  
+    align-items: center; 
+}
+
+.navbar-nav{
+    display: flex;
+    align-items: center;
 }
 
 .navbar-logo {
@@ -118,6 +126,7 @@ body {
     padding: 2rem;
     margin: 2rem auto;
     max-width: 800px;
+    text-align: center;
 }
 
 .welcome-message h2 {
