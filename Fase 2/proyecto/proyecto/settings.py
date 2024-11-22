@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'crispy_bootstrap4',
     'crispy_forms',
     'panaderia',
+    'widget_tweaks',
 ]
 
 MIDDLEWARE = [
@@ -144,3 +145,4 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'  # O 'bootstrap5' si prefieres
+LANGUAGE_CODE = 'es'

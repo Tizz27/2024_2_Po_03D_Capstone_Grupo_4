@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from django.contrib.auth.models import User
 
 class Cliente(models.Model):
     id_cliente = models.AutoField(primary_key=True)  # AutoField crea un ID auto-incremental

@@ -1,15 +1,12 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
-from .models import Producto, Cliente,DetallePedido, Pedido, Sucursal
-from .forms import ProductoForm,ClienteForm,LoginForm, PedidoForm
+from .models import Producto, Cliente,DetallePedido, Sucursal
+from .forms import ProductoForm,ClienteForm,LoginForm, PedidoForm, AdministradorForm,CustomUserCreationForm
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth import logout
 from django.contrib import messages
 from django.db import transaction
-from decimal import Decimal, InvalidOperation
 from django.contrib.sessions.models import Session
-from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseBadRequest
 
 
 
@@ -310,24 +307,35 @@ def registrar_cliente(request):
 def gestion(request):
     # Obtener el término de búsqueda
     query = request.GET.get('q', '')
-    
     # Filtrar los productos si hay un término de búsqueda
     if query:
         productos = Producto.objects.filter(nombre_producto__icontains=query)
     else:
         productos = Producto.objects.all()
-    
-    # Contar los productos registrados
-    productos_count = Producto.objects.count()
-
-    # Contar los clientes registrados
-    clientes_count = Cliente.objects.count()
-
     return render(request, 'gestionproducto.html', {
         'productos': productos,
-        'productos_count': productos_count,  # Pasamos el conteo de productos
-        'clientes_count': clientes_count
+        
     })
+def listar_clientes(request):
+    clientes = Cliente.objects.all()  # Obtiene todos los clientes
+    total_clientes = clientes.count()  # Cuenta el total de clientes
+    
+    # Si hay una búsqueda, filtramos los resultados
+    query = request.GET.get('q', '')
+    if query:
+        clientes = clientes.filter(nombre_completo__icontains=query) | clientes.filter(email__icontains=query)
+
+    return render(request, 'clientes.html', {'clientes': clientes, 'total_clientes': total_clientes, 'query': query})
+
+def eliminar_cliente(request, id_cliente):
+    cliente = get_object_or_404(Cliente, id_cliente=id_cliente)
+
+    if request.method == 'POST':
+        cliente.delete()
+        messages.success(request, f'El cliente {cliente.nombre_completo} ha sido eliminado con éxito.')
+        return redirect('listar_clientes')
+
+    return redirect('listar_clientes')
 
 def home(request):
     return render (request,'home.html')
@@ -382,3 +390,15 @@ def cerrar(request):
     logout(request)
     return render (request,'base.html')
 
+
+def registrar_administrador(request):
+    if request.method == 'POST':
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            # Guardar el nuevo usuario
+            form.save()
+            return redirect('/registroadmin/')  # Redirigir al login después de registrar al usuario
+    else:
+        form = CustomUserCreationForm()
+    
+    return render(request, 'registroadmin.html', {'form': form})

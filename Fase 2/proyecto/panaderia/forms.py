@@ -2,9 +2,48 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from .models import Producto
-from .models import Cliente
+from .models import Cliente, Administrador
 from .models import Pedido, DetallePedido
+import datetime
 
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Submit, Layout, Fieldset, Row, Column
+
+class CustomUserCreationForm(UserCreationForm):
+    class Meta:
+        model = User
+        fields = ['username', "first_name", "email", "password1", "password2"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.layout = Layout(
+            Fieldset(
+                'Registrar',
+                Row(
+                    Column('username', css_class='form-group col-md-6 mb-0'),
+                    Column('first_name', css_class='form-group col-md-6 mb-0'),
+                ),
+                'email',
+                Row(
+                    Column('password1', css_class='form-group col-md-6 mb-0'),
+                    Column('password2', css_class='form-group col-md-6 mb-0'),
+                )
+            ),
+            Submit('submit', 'Iniciar', css_class='btn btn-primary mt-3')
+        )
+
+
+class AdministradorForm(forms.ModelForm):
+    class Meta:
+        model = Administrador
+        fields = ['nombre', 'email', 'contraseña', 'cargo']
+        
+    # Hacemos que la contraseña se ingrese como un campo seguro
+    contraseña = forms.CharField(widget=forms.PasswordInput())
+
+
+    
 class PedidoForm(forms.ModelForm):
     class Meta:
         model = Pedido
@@ -22,10 +61,7 @@ class DetallePedidoForm(forms.ModelForm):
     cantidad = forms.IntegerField(min_value=1)
     producto = forms.ModelChoiceField(queryset=Producto.objects.all())
  
-class CustomUserCreationForm(UserCreationForm):
-    class Meta:
-        model= User
-        fields= ['username', "first_name","email", "password1", "password2"]        
+      
 
 class ProductoForm(forms.ModelForm):
     
@@ -33,8 +69,6 @@ class ProductoForm(forms.ModelForm):
         model =Producto
         fields = '__all__'
 
-import datetime
-import re
 
 class ClienteForm(forms.ModelForm):
     class Meta:
