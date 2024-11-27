@@ -11,6 +11,8 @@ class Cliente(models.Model):
     direccion = models.CharField(max_length=200, blank=True, null=True)
     rut = models.CharField(max_length=9, unique=True)
     fecha_registro = models.DateField(auto_now_add=True)  # Se registra automáticamente la fecha
+    def __str__(self):
+        return self.email
 
     class Meta:
         db_table = 'Cliente'
@@ -22,7 +24,7 @@ class Sucursal(models.Model):
     ciudad = models.CharField(max_length=30)
 
     class Meta:
-        db_table = 'Sucursales'
+        db_table = 'Sucursal'
 
 class Pedido(models.Model):
     id_pedido = models.AutoField(primary_key=True)
@@ -34,6 +36,10 @@ class Pedido(models.Model):
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE, related_name='pedidos')
     sucursal = models.ForeignKey(Sucursal, on_delete=models.CASCADE, related_name='pedidos', null=True, blank=True)
     comentarios = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return self.estado
+    
     
 
     class Meta:
@@ -82,6 +88,8 @@ class Producto(models.Model):
     imagen = models.ImageField(upload_to="img/productos/")
     categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE, related_name='productos')
     administrador = models.ForeignKey(Administrador, on_delete=models.CASCADE, related_name='productos')
+    def __str__(self):
+        return self.nombre_producto
 
     class Meta:
         db_table = 'Producto'
@@ -93,6 +101,7 @@ class DetallePedido(models.Model):
     subtotal = models.DecimalField(max_digits=7, decimal_places=0)
     pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE, related_name='detalles')
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE, related_name='detalles')
+    
 
     class Meta:
         db_table = 'Detalle_Pedido'

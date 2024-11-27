@@ -119,7 +119,7 @@
             max-width: 70%;
         }
     </style>
-    <title>Gestión de Clientes | Arte en Masa</title>
+    <title>Gestión de Pedidos | Arte en Masa</title>
 </head>
 
 <body>
@@ -147,82 +147,74 @@
             <a href="/registroadmin/"><i class="fas fa-chart-bar"></i>Nuevo admin</a>
         </aside>
 
-    <div class="container mt-5">
-        <h1 class="mb-4">Total de clientes {{ total_clientes }}</h1>
-       
+        <div class="main-content">
+            <h1 class="page-title">Gestión de Pedidos</h1>
 
-        <!-- Formulario de búsqueda -->
-        <form method="GET" action="{% url 'listar_clientes' %}" class="mb-4">
-            <div class="input-group">
-                <input type="text" name="q" class="form-control" placeholder="Buscar por nombre o email" value="{{ query }}">
-                <button class="btn btn-primary" type="submit">Buscar</button>
-            </div>
-        </form>
-
-        <!-- Tabla de clientes -->
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Nombre</th>
-                    <th>Email</th>
-                    <th>Pedidos</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for cliente in clientes %}
-                <tr>
-                    <td>{{ cliente.id_cliente }}</td>
-                    <td>{{ cliente.nombre_completo }}</td>
-                    <td>{{ cliente.email }}</td>
-                    <td>{{ cliente.pedidos.count }}</td>
-                   
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="5" class="text-center">No se encontraron clientes.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-
-    <!-- Modal de Confirmación -->
-    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmación de Eliminación</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                </div>
-                <div class="modal-body">
-                    ¿Estás seguro de que deseas eliminar este cliente? <br>
-                    <small>Esta acción no se puede deshacer.</small>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <form id="deleteForm" method="POST" action="" style="display:inline;">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-danger">Eliminar</button>
-                    </form>
-                </div>
-            </div>
+            <!-- Tabla de pedidos -->
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID Pedido</th>
+                        <th>Cliente</th>
+                        <th>Fecha Pedido</th>
+                        <th>Estado</th>
+                        <th>Total</th>
+                        <th>Direccion</th> <!-- Nueva columna -->
+                        <th>Detalles</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pedido in pedidos %}
+                        <tr>
+                            <td>{{ pedido.id_pedido }}</td>
+                            <td>{{ pedido.cliente.nombre_completo }}</td>
+                            <td>{{ pedido.fecha_pedido }}</td>
+                            <td>{{ pedido.estado }}</td>
+                            <td>{{ pedido.total }}</td>
+                            <td>
+                                {% if pedido.direccion_envio %}
+                                    {{ pedido.direccion_envio }}
+                                {% elif pedido.sucursal %}
+                                    {{ pedido.sucursal.nombre_sucursal }} <!-- Aquí se muestra el nombre de la sucursal -->
+                                {% else %}
+                                    No especificado
+                                {% endif %}
+                            </td> <!-- Mostrar tipo de envío y detalles -->
+                            <td>
+                                <button type="button" class="btn btn-info" data-bs-toggle="collapse" data-bs-target="#detalles-{{ pedido.id_pedido }}">
+                                    Ver detalles
+                                </button>
+                                <div id="detalles-{{ pedido.id_pedido }}" class="collapse mt-2">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Producto</th>
+                                                <th>Cantidad</th>
+                                                <th>Precio Unitario</th>
+                                                <th>Subtotal</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for detalle in pedido.detalles.all %}
+                                                <tr>
+                                                    <td>{{ detalle.producto.nombre_producto }}</td>
+                                                    <td>{{ detalle.cantidad }}</td>
+                                                    <td>{{ detalle.precio_unitario }}</td>
+                                                    <td>{{ detalle.subtotal }}</td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-    <script>
-        var confirmDeleteModal = document.getElementById('confirmDeleteModal');
-        confirmDeleteModal.addEventListener('show.bs.modal', function (event) {
-            var button = event.relatedTarget;
-            var clienteId = button.getAttribute('data-id');
-            var formAction = '{% url "eliminar_cliente" 0 %}'.slice(0, -1) + clienteId + '/';
-
-            var form = document.getElementById('deleteForm');
-            form.action = formAction;
-        });
-    </script>
 </body>
 
 </html>

@@ -5,7 +5,6 @@ from .models import Producto
 from .models import Cliente, Administrador
 from .models import Pedido, DetallePedido
 import datetime
-
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit, Layout, Fieldset, Row, Column
 
@@ -47,7 +46,7 @@ class AdministradorForm(forms.ModelForm):
 class PedidoForm(forms.ModelForm):
     class Meta:
         model = Pedido
-        fields = [ 'estado', 'direccion_envio', 'fecha_entrega', 'comentarios', 'sucursal', 'total', 'cliente']
+        fields = [ 'direccion_envio', 'fecha_entrega', 'comentarios', 'sucursal']
         widgets = {
             'fecha_entrega': forms.DateInput(attrs={'type': 'date'}),
         }
