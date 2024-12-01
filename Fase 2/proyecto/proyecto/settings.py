@@ -91,7 +91,7 @@ WSGI_APPLICATION = 'proyecto.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',   # Usa el backend MySQL
-        'NAME': 'Arteenmasa',                  # Nombre de tu base de datos
+        'NAME': 'arteenmasa',                  # Nombre de tu base de datos
         'USER': 'root',                   # Usuario de MySQL
         'PASSWORD': '23Deabril',            # Contraseña de MySQL
         'HOST': 'localhost',                    # Dirección del host (localhost para máquina local)

@@ -8,6 +8,7 @@ import datetime
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit, Layout, Fieldset, Row, Column
 
+
 class CustomUserCreationForm(UserCreationForm):
     class Meta:
         model = User

@@ -1,19 +1,70 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Producto, Cliente,DetallePedido, Sucursal
 from .forms import ProductoForm,ClienteForm,LoginForm, PedidoForm, AdministradorForm,CustomUserCreationForm
-from django.contrib.auth.hashers import make_password
 from django.contrib.auth import logout
 from django.contrib import messages
 from django.db import transaction
-
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib import messages
-from .models import Producto, Pedido, DetallePedido, Sucursal, Cliente
+from .models import Producto, Pedido, DetallePedido, Sucursal, Cliente,Categoria,Ingrediente, Tamaño
 from django.utils.timezone import now
 
+from django.shortcuts import render, get_object_or_404
+from .models import Categoria, Producto, Ingrediente, Tamaño
 
+from django.shortcuts import render, get_object_or_404
+from decimal import Decimal
 
-# Función auxiliar para calcular el total del carrito
+def productos(request):
+    categorias = Categoria.objects.all()
+    productos = Producto.objects.all()
+    categoria_seleccionada = request.GET.get('categoria')
+    producto_detalle = None
+    ingredientes_adicionales = Ingrediente.objects.all()
+    tamaños_disponibles = Tamaño.objects.all()
+    total_calculado = None
+
+    # Filtrar productos por categoría
+    if categoria_seleccionada:
+        categoria_obj = get_object_or_404(Categoria, id_categoria=categoria_seleccionada)
+        productos = Producto.objects.filter(categoria=categoria_obj)
+
+    # Obtener el detalle del producto si está seleccionado
+    producto_id = request.GET.get('producto_id')
+    if producto_id:
+        producto_detalle = get_object_or_404(Producto, id_producto=producto_id)
+
+    # Procesar el formulario de pedido
+    if request.method == 'POST':
+        cantidad = int(request.POST.get('cantidad', 1))
+        ingredientes_ids = request.POST.getlist('ingredientes')
+
+        # Obtener el tamaño si está seleccionado
+        tamaño_id = request.POST.get('tamaño')
+        tamaño_obj = Tamaño.objects.get(id=tamaño_id) if tamaño_id else None
+        ingredientes_objs = Ingrediente.objects.filter(id__in=ingredientes_ids)
+
+        # Calcula el precio base ajustado
+        precio_base = producto_detalle.precio
+
+        # Si es "Panadería" o "Repostería", multiplicamos el precio base por la cantidad
+        if producto_detalle.categoria.nombre_categoria in ['Panaderia', 'Reposteria']:
+            total_calculado = precio_base * cantidad
+        else:
+            # Si no es "Panadería" ni "Repostería", calculamos el precio con ingredientes adicionales y tamaño
+            if tamaño_obj:
+                precio_base = tamaño_obj.precio_adicional
+            precio_ingredientes = sum(ingrediente.precio_adicional for ingrediente in ingredientes_objs)
+            total_calculado = (precio_base + precio_ingredientes) * cantidad
+
+    return render(request, 'nuevo.html', {
+        'productos': productos,
+        'categorias': categorias,
+        'categoria_seleccionada': categoria_seleccionada,
+        'producto_detalle': producto_detalle,
+        'ingredientes_adicionales': ingredientes_adicionales,
+        'tamaños_disponibles': tamaños_disponibles,
+        'total_calculado': total_calculado,
+    })
+
 def calcular_total_carrito(carrito):
     return sum(float(item['subtotal']) for item in carrito.values())
 

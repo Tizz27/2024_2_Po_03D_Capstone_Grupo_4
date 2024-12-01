@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Cliente, Sucursal, Pedido, Pago, Administrador, Categoria, Producto, DetallePedido
+from .models import Cliente, Sucursal, Pedido, Pago,Ingrediente, Tamaño,Administrador, Categoria, Producto, DetallePedido
 
 class AdministradorAdmin(admin.ModelAdmin):
     list_display = ('nombre', 'email', 'cargo')  # Campos a mostrar en la lista de administración
@@ -13,5 +13,8 @@ admin.site.register(Sucursal)
 admin.site.register(Pedido)
 admin.site.register(Pago)
 admin.site.register(Categoria)
+admin.site.register(Ingrediente)
+admin.site.register(Tamaño)
 admin.site.register(Producto)
 admin.site.register(DetallePedido)
+

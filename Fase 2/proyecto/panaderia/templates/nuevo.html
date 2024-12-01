@@ -1,0 +1,87 @@
+<h2>Productos</h2>
+
+<!-- Mostrar las categorías -->
+<form method="GET" action="">
+    <select name="categoria" onchange="this.form.submit()">
+        <option value="">Selecciona una categoría</option>
+        {% for categoria in categorias %}
+            <option value="{{ categoria.id_categoria }}" {% if categoria.id_categoria == categoria_seleccionada %}selected{% endif %}>{{ categoria.nombre_categoria }}</option>
+        {% endfor %}
+    </select>
+</form>
+
+<!-- Mostrar los productos -->
+<ul>
+    {% for producto in productos %}
+    <li>
+        <a href="?producto_id={{ producto.id_producto }}">{{ producto.nombre_producto }} 
+        (Categoría: {{ producto.categoria.nombre_categoria }})</a>
+    </li>
+    {% endfor %}
+</ul>
+
+<!-- Si hay un producto seleccionado, mostrar los detalles -->
+{% if producto_detalle %}
+    <h3>Detalle del Producto: {{ producto_detalle.nombre_producto }}</h3>
+    <p>{{ producto_detalle.descripcion }}</p>
+    
+    <h4>Ingredientes:</h4>
+    {% if producto_detalle.categoria.nombre_categoria == 'Pasteleria' %}
+        <ul>
+            {% for ingrediente in producto_detalle.ingredientes.all %}
+                <li>{{ ingrediente.nombre }} (+${{ ingrediente.precio_adicional }})</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <h4>Precio Base: ${{ producto_detalle.precio }}</h4>
+
+    <form method="POST" action="">
+        {% csrf_token %}
+        
+        {% if producto_detalle.categoria.nombre_categoria == 'Panaderia' or producto_detalle.categoria.nombre_categoria == 'Reposteria' %}
+            <!-- Solo cantidad para Panadería y Repostería -->
+            <label for="cantidad">Cantidad:</label>
+            <input type="number" name="cantidad" id="cantidad" value="1" min="1">
+        {% elif producto_detalle.categoria.nombre_categoria != 'Postres' %}
+            <!-- Ingredientes solo si no es "Postres" -->
+            <h4>Selecciona el tamaño:</h4>
+            <select name="tamaño">
+                {% for tamaño in tamaños_disponibles %}
+                    <option value="{{ tamaño.id }}">{{ tamaño.nombre }} (+${{ tamaño.precio_adicional }})</option>
+                {% endfor %}
+            </select>
+
+            <h4>Ingredientes adicionales:</h4>
+            <ul>
+                {% for ingrediente in ingredientes_adicionales %}
+                    <li>
+                        <label>
+                            <input type="checkbox" name="ingredientes" value="{{ ingrediente.id }}">{{ ingrediente.nombre }} (+${{ ingrediente.precio_adicional }})
+                        </label>
+                    </li>
+                {% endfor %}
+            </ul>
+
+            <label for="cantidad">Cantidad:</label>
+            <input type="number" name="cantidad" id="cantidad" value="1" min="1">
+        {% else %}
+            <!-- Solo tamaño y cantidad para "Postres" -->
+            <h4>Selecciona el tamaño:</h4>
+            <select name="tamaño">
+                {% for tamaño in tamaños_disponibles %}
+                    <option value="{{ tamaño.id }}">{{ tamaño.nombre }} (+${{ tamaño.precio_adicional }})</option>
+                {% endfor %}
+            </select>
+
+            <label for="cantidad">Cantidad:</label>
+            <input type="number" name="cantidad" id="cantidad" value="1" min="1">
+        {% endif %}
+
+        <button type="submit">Calcular precio</button>
+    </form>
+
+    {% if total_calculado %}
+        <h4>Total: ${{ total_calculado }}</h4>
+    {% endif %}
+{% endif %}

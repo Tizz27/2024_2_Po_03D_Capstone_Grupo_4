@@ -22,6 +22,8 @@ class Sucursal(models.Model):
     nombre = models.CharField(max_length=30)
     direccion = models.CharField(max_length=50)
     ciudad = models.CharField(max_length=30)
+    def __str__(self):
+        return self.nombre
 
     class Meta:
         db_table = 'Sucursal'
@@ -39,9 +41,6 @@ class Pedido(models.Model):
 
     def __str__(self):
         return self.estado
-    
-    
-
     class Meta:
         db_table = 'Pedido'
 
@@ -79,6 +78,23 @@ class Categoria(models.Model):
     class Meta:
         db_table = 'Categoria'
 
+class Ingrediente(models.Model):
+    nombre = models.CharField(max_length=100)
+    precio_adicional = models.DecimalField(max_digits=5, decimal_places=0)
+
+    def __str__(self):
+        return self.nombre
+    
+class Tamaño(models.Model):
+    nombre = models.CharField(max_length=50)  # Ejemplo: "Pequeño", "Mediano", "Grande"
+    precio_adicional = models.DecimalField(max_digits=6, decimal_places=0)  # Precio adicional por el tamaño
+
+    def __str__(self):
+        return self.nombre
+
+    class Meta:
+        db_table = 'Tamaño'
+
 class Producto(models.Model):
     id_producto = models.AutoField(primary_key=True)
     nombre_producto = models.CharField(max_length=30)
@@ -88,6 +104,11 @@ class Producto(models.Model):
     imagen = models.ImageField(upload_to="img/productos/")
     categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE, related_name='productos')
     administrador = models.ForeignKey(Administrador, on_delete=models.CASCADE, related_name='productos')
+    ingredientes = models.ManyToManyField(Ingrediente, related_name='productos', blank=True)  # Relación con Ingredientes
+    tamaño = models.ManyToManyField(Tamaño, related_name='productos', blank=True)
+    cantidad_minima = models.IntegerField(default=1,null=True, blank=True)  # Cantidad mínima de venta, por ejemplo 1 unidad
+    cantidad_maxima = models.IntegerField(null=True, blank=True)
+
     def __str__(self):
         return self.nombre_producto
 
@@ -105,3 +126,7 @@ class DetallePedido(models.Model):
 
     class Meta:
         db_table = 'Detalle_Pedido'
+
+        
+
+
