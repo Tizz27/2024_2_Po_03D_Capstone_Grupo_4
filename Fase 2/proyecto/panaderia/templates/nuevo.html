@@ -1,87 +1,115 @@
-<h2>Productos</h2>
+{% extends 'base.html' %}
 
-<!-- Mostrar las categorías -->
-<form method="GET" action="">
-    <select name="categoria" onchange="this.form.submit()">
-        <option value="">Selecciona una categoría</option>
-        {% for categoria in categorias %}
-            <option value="{{ categoria.id_categoria }}" {% if categoria.id_categoria == categoria_seleccionada %}selected{% endif %}>{{ categoria.nombre_categoria }}</option>
-        {% endfor %}
-    </select>
-</form>
+{% block contenido %}
+<body style="background: linear-gradient(135deg, #E8D7E3, #F8D6C2, #D6CFE4, #FFF);">
+    <div class="container-fluid col-md-8 offset-md-2 mt-4" style="background-color: rgba(255, 255, 255, 0.85);">
+        <div class="text-center py-3">
+            <h3>Productos</h3>
+        </div>
+        <div class="row">
+            <!-- Selección de Categoría -->
+            <div class="col-md-12 mb-4">
+                <form method="GET" action="">
+                    <div class="form-group">
+                        <label for="categoria">Selecciona una categoría:</label>
+                        <select name="categoria" id="categoria" class="form-control" onchange="this.form.submit()">
+                            <option value="">Selecciona una categoría</option>
+                            {% for categoria in categorias %}
+                                <option value="{{ categoria.id_categoria }}" {% if categoria.id_categoria == categoria_seleccionada %}selected{% endif %}>{{ categoria.nombre_categoria }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </form>
+            </div>
 
-<!-- Mostrar los productos -->
-<ul>
-    {% for producto in productos %}
-    <li>
-        <a href="?producto_id={{ producto.id_producto }}">{{ producto.nombre_producto }} 
-        (Categoría: {{ producto.categoria.nombre_categoria }})</a>
-    </li>
-    {% endfor %}
-</ul>
+            <!-- Productos Listados -->
+            <div class="col-md-12 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h4>Productos Disponibles</h4>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group">
+                            {% for producto in productos %}
+                                <li class="list-group-item">
+                                    <a href="?producto_id={{ producto.id_producto }}" class="text-decoration-none">
+                                        {{ producto.nombre_producto }} 
+                                        (Categoría: {{ producto.categoria.nombre_categoria }})
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
 
-<!-- Si hay un producto seleccionado, mostrar los detalles -->
-{% if producto_detalle %}
-    <h3>Detalle del Producto: {{ producto_detalle.nombre_producto }}</h3>
-    <p>{{ producto_detalle.descripcion }}</p>
-    
-    <h4>Ingredientes:</h4>
-    {% if producto_detalle.categoria.nombre_categoria == 'Pasteleria' %}
-        <ul>
-            {% for ingrediente in producto_detalle.ingredientes.all %}
-                <li>{{ ingrediente.nombre }} (+${{ ingrediente.precio_adicional }})</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
+            <!-- Detalles del Producto Seleccionado -->
+            {% if producto_detalle %}
+            <div class="col-md-12 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-success text-white">
+                        <h4>Detalle del Producto: {{ producto_detalle.nombre_producto }}</h4>
+                    </div>
+                    <div class="card-body">
+                        <p>{{ producto_detalle.descripcion }}</p>
 
-    <h4>Precio Base: ${{ producto_detalle.precio }}</h4>
+                        <h5>Ingredientes:</h5>
+                        {% if producto_detalle.categoria.nombre_categoria == 'Pasteleria' %}
+                            <ul>
+                                {% for ingrediente in producto_detalle.ingredientes.all %}
+                                    <li>{{ ingrediente.nombre }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
 
-    <form method="POST" action="">
-        {% csrf_token %}
-        
-        {% if producto_detalle.categoria.nombre_categoria == 'Panaderia' or producto_detalle.categoria.nombre_categoria == 'Reposteria' %}
-            <!-- Solo cantidad para Panadería y Repostería -->
-            <label for="cantidad">Cantidad:</label>
-            <input type="number" name="cantidad" id="cantidad" value="1" min="1">
-        {% elif producto_detalle.categoria.nombre_categoria != 'Postres' %}
-            <!-- Ingredientes solo si no es "Postres" -->
-            <h4>Selecciona el tamaño:</h4>
-            <select name="tamaño">
-                {% for tamaño in tamaños_disponibles %}
-                    <option value="{{ tamaño.id }}">{{ tamaño.nombre }} (+${{ tamaño.precio_adicional }})</option>
-                {% endfor %}
-            </select>
+                        <h5>Precio Base: ${{ producto_detalle.precio }}</h5>
 
-            <h4>Ingredientes adicionales:</h4>
-            <ul>
-                {% for ingrediente in ingredientes_adicionales %}
-                    <li>
-                        <label>
-                            <input type="checkbox" name="ingredientes" value="{{ ingrediente.id }}">{{ ingrediente.nombre }} (+${{ ingrediente.precio_adicional }})
-                        </label>
-                    </li>
-                {% endfor %}
-            </ul>
+                        <!-- Formulario para agregar al carrito -->
+                        <form method="POST" action="{% url 'agregar_al_carrito' producto_detalle.id_producto %}">
+                            {% csrf_token %}
 
-            <label for="cantidad">Cantidad:</label>
-            <input type="number" name="cantidad" id="cantidad" value="1" min="1">
-        {% else %}
-            <!-- Solo tamaño y cantidad para "Postres" -->
-            <h4>Selecciona el tamaño:</h4>
-            <select name="tamaño">
-                {% for tamaño in tamaños_disponibles %}
-                    <option value="{{ tamaño.id }}">{{ tamaño.nombre }} (+${{ tamaño.precio_adicional }})</option>
-                {% endfor %}
-            </select>
+                            {% if producto_detalle.categoria.nombre_categoria == 'Pasteleria' %}
+                            <h5>Ingredientes adicionales:</h5>
+                            <ul>
+                                {% for ingrediente in ingredientes_adicionales %}
+                                    <li>
+                                        <label>
+                                            <input type="checkbox" name="ingredientes" value="{{ ingrediente.id }}">
+                                            {{ ingrediente.nombre }} (+${{ ingrediente.precio_adicional }})
+                                        </label>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
 
-            <label for="cantidad">Cantidad:</label>
-            <input type="number" name="cantidad" id="cantidad" value="1" min="1">
-        {% endif %}
+                            {% if producto_detalle.categoria.nombre_categoria != 'Panaderia' and producto_detalle.categoria.nombre_categoria != 'Reposteria' %}
+                            <h5>Selecciona el tamaño:</h5>
+                            <select name="tamaño" class="form-control">
+                                {% for tamaño in tamaños_disponibles %}
+                                    <option value="{{ tamaño.id }}">{{ tamaño.nombre }} (+${{ tamaño.precio_adicional }})</option>
+                                {% endfor %}
+                            </select>
+                            {% endif %}
 
-        <button type="submit">Calcular precio</button>
-    </form>
+                            <div class="form-group mt-3">
+                                <label for="cantidad">Cantidad:</label>
+                                <input type="number" name="cantidad" id="cantidad" value="1" min="1" class="form-control">
+                            </div>
 
-    {% if total_calculado %}
-        <h4>Total: ${{ total_calculado }}</h4>
-    {% endif %}
-{% endif %}
+                            <button type="submit" class="btn btn-success btn-block mt-3">Agregar al carrito</button>
+                        </form>
+                        {% if total_calculado %}
+                        <h4 class="total-calculado">Total: ${{ total_calculado }}</h4>
+                    {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        <div class="d-flex justify-content-between mt-3">
+            <a href="{% url 'mostrar_productos' %}" class="btn btn-secondary">Volver al Menú</a>
+        </div>
+        <br>
+    </div>
+</body>
+{% endblock %}

@@ -34,26 +34,24 @@ def productos(request):
 
     # Procesar el formulario de pedido
     if request.method == 'POST':
-        cantidad = int(request.POST.get('cantidad', 1))
-        ingredientes_ids = request.POST.getlist('ingredientes')
-
-        # Obtener el tamaño si está seleccionado
         tamaño_id = request.POST.get('tamaño')
+        ingredientes_ids = request.POST.getlist('ingredientes')
+        cantidad = int(request.POST.get('cantidad', 1))
+
         tamaño_obj = Tamaño.objects.get(id=tamaño_id) if tamaño_id else None
         ingredientes_objs = Ingrediente.objects.filter(id__in=ingredientes_ids)
 
-        # Calcula el precio base ajustado
+        # Inicializamos el precio base sin ajuste
         precio_base = producto_detalle.precio
 
-        # Si es "Panadería" o "Repostería", multiplicamos el precio base por la cantidad
-        if producto_detalle.categoria.nombre_categoria in ['Panaderia', 'Reposteria']:
-            total_calculado = precio_base * cantidad
-        else:
-            # Si no es "Panadería" ni "Repostería", calculamos el precio con ingredientes adicionales y tamaño
-            if tamaño_obj:
-                precio_base = tamaño_obj.precio_adicional
-            precio_ingredientes = sum(ingrediente.precio_adicional for ingrediente in ingredientes_objs)
-            total_calculado = (precio_base + precio_ingredientes) * cantidad
+        # Si se seleccionó un tamaño, solo sumamos el precio adicional del tamaño
+        if tamaño_obj:
+            precio_base = 0  # No sumamos el precio base del producto, solo el precio adicional del tamaño
+            precio_base += tamaño_obj.precio_adicional  # Solo agregamos el precio adicional del tamaño
+
+        # Calcular el precio total con ingredientes adicionales y cantidad
+        precio_ingredientes = sum(ingrediente.precio_adicional for ingrediente in ingredientes_objs)
+        total_calculado = (precio_base + precio_ingredientes) * cantidad
 
     return render(request, 'nuevo.html', {
         'productos': productos,
@@ -64,6 +62,7 @@ def productos(request):
         'tamaños_disponibles': tamaños_disponibles,
         'total_calculado': total_calculado,
     })
+
 
 def calcular_total_carrito(carrito):
     return sum(float(item['subtotal']) for item in carrito.values())
@@ -283,14 +282,32 @@ def ver_carrito(request):
 # Vista para agregar un producto al carrito
 def agregar_al_carrito(request, id_producto):
     producto = get_object_or_404(Producto, id_producto=id_producto)
+    
+    # Obtener la cantidad, ingredientes y tamaño del formulario
+    cantidad = int(request.POST.get('cantidad', 1))
+    ingredientes_ids = request.POST.getlist('ingredientes')
+    tamaño_id = request.POST.get('tamaño')
+    
+    # Obtener el tamaño si está seleccionado
+    tamaño_obj = Tamaño.objects.get(id=tamaño_id) if tamaño_id else None
+    ingredientes_objs = Ingrediente.objects.filter(id__in=ingredientes_ids)
+    
+    # Calcular el precio base ajustado
+    precio_base = producto.precio
+    precio_ingredientes = sum(ingrediente.precio_adicional for ingrediente in ingredientes_objs)
+    precio_tamaño = tamaño_obj.precio_adicional if tamaño_obj else 0
+
+    # Calcular el total ajustado
+    total_producto = (precio_base + precio_ingredientes + precio_tamaño) * cantidad
+
     if 'carrito' not in request.session:
         request.session['carrito'] = {}
 
     carrito = request.session['carrito']
 
-    # Actualizar cantidad y subtotal si el producto ya está en el carrito
+    # Actualizar el carrito
     if str(id_producto) in carrito:
-        carrito[str(id_producto)]['cantidad'] += 1
+        carrito[str(id_producto)]['cantidad'] += cantidad
         carrito[str(id_producto)]['subtotal'] = str(
             float(carrito[str(id_producto)]['precio']) * carrito[str(id_producto)]['cantidad']
         )
@@ -298,9 +315,9 @@ def agregar_al_carrito(request, id_producto):
         # Agregar producto al carrito
         carrito[str(id_producto)] = {
             'nombre': producto.nombre_producto,
-            'precio': str(producto.precio),
-            'cantidad': 1,
-            'subtotal': str(producto.precio)
+            'precio': str(precio_base + precio_ingredientes + precio_tamaño),
+            'cantidad': cantidad,
+            'subtotal': str(total_producto),
         }
 
     request.session['carrito'] = carrito
@@ -309,6 +326,7 @@ def agregar_al_carrito(request, id_producto):
 
 # Vista para eliminar un producto del carrito
 def eliminar_del_carrito(request, id_producto):
+    print(f"Eliminando producto con clave: {id_producto}")  # Depuración
     carrito = request.session.get('carrito', {})
     if str(id_producto) in carrito:
         if carrito[str(id_producto)]['cantidad'] > 1:

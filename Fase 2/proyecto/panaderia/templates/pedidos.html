@@ -17,27 +17,22 @@
             background-color: #F8F2F1;
             color: #5A3D2E;
         }
-
         .navbar-custom {
             background-color: #E8D7E3;
             padding: 0.8rem;
         }
-
         .navbar-nav .nav-link {
             color: #5A3D2E !important;
             font-weight: bold;
         }
-
         .navbar-brand img {
             height: 40px;
         }
-
         .sidebar {
             height: 100vh;
             background-color: #D6CFE4;
             padding: 1rem;
         }
-
         .sidebar a {
             display: flex;
             align-items: center;
@@ -48,73 +43,59 @@
             margin-bottom: 10px;
             border-radius: 5px;
         }
-
         .sidebar a:hover,
         .sidebar a.active {
             background-color: #FFC0A1;
             color: #FFF;
         }
-
         .sidebar a i {
             margin-right: 10px;
         }
-
         .main-content {
             margin-left: 220px;
             padding: 2rem;
             background-color: #FFF;
             min-height: 100vh;
         }
-
         .page-title {
             font-size: 1.8rem;
             color: #5A3D2E;
             margin-bottom: 1.5rem;
         }
-
         .table th,
         .table td {
             color: #5A3D2E;
         }
-
         .btn-buscar {
             background-color: #FFB3BA;
             color: #5A3D2E;
             font-weight: bold;
         }
-
         .btn-buscar:hover {
             background-color: #FF8F85;
         }
-
         .btn-agregar {
             background-color: #B2F7EF;
             color: #5A3D2E;
             font-weight: bold;
         }
-
         .btn-agregar:hover {
             background-color: #80E8D4;
         }
-
         .btn-secondary {
             background-color: #B3D9FF;
             color: #5A3D2E;
         }
-
         .btn-secondary:hover {
             background-color: #5a93cc;
         }
-
         .btn-warning {
             background-color: #FFB380;
             color: #5A3D2E;
         }
-
         .btn-warning:hover {
             background-color: #FF9F5F;
         }
-
         .input-group .form-control {
             max-width: 70%;
         }
@@ -192,6 +173,8 @@
                                                 <th>Cantidad</th>
                                                 <th>Precio Unitario</th>
                                                 <th>Subtotal</th>
+                                                <th>Ingredientes Adicionales</th> <!-- Nueva columna -->
+                                                <th>Tamaño</th> <!-- Nueva columna -->
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -201,6 +184,24 @@
                                                     <td>{{ detalle.cantidad }}</td>
                                                     <td>{{ detalle.precio_unitario }}</td>
                                                     <td>{{ detalle.subtotal }}</td>
+                                                    <td>
+                                                        {% if detalle.ingredientes_adicionales.all %}
+                                                            <ul>
+                                                                {% for ingrediente in detalle.ingredientes_adicionales.all %}
+                                                                    <li>{{ ingrediente.nombre_ingrediente }}</li>
+                                                                {% endfor %}
+                                                            </ul>
+                                                        {% else %}
+                                                            No tiene ingredientes adicionales
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>
+                                                        {% if detalle.tamaño %}
+                                                            {{ detalle.tamaño.nombre_tamaño }}
+                                                        {% else %}
+                                                            No especificado
+                                                        {% endif %}
+                                                    </td>
                                                 </tr>
                                             {% endfor %}
                                         </tbody>
