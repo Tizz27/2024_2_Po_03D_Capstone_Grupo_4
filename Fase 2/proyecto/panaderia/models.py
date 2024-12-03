@@ -122,6 +122,9 @@ class DetallePedido(models.Model):
     subtotal = models.DecimalField(max_digits=7, decimal_places=0)
     pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE, related_name='detalles')
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE, related_name='detalles')
+    tamaño = models.ForeignKey(Tamaño, on_delete=models.CASCADE, related_name='detalles', null=True, blank=True)  # Nuevo campo
+    ingredientes = models.ManyToManyField(Ingrediente, related_name='detalles', blank=True)  # Nuevo campo
+    
     class Meta:
         db_table = 'Detalle_Pedido'
 

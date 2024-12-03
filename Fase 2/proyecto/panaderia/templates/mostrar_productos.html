@@ -78,7 +78,6 @@
           <h5 class="card-title">{{ producto.nombre_producto }}</h5>
           <p>{{ producto.descripcion }}</p>
           <p>Precio: ${{ producto.precio|floatformat:0 }}</p>
-          <p>Stock: {{ producto.stock }}</p>
           <a href="{% url 'agregar_al_carrito' producto.id_producto %}" class="btn btn-primary">Agregar al carrito</a>
         </div>
       </div>

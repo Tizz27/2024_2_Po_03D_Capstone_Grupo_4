@@ -6,12 +6,16 @@ from django.contrib import messages
 from django.db import transaction
 from .models import Producto, Pedido, DetallePedido, Sucursal, Cliente,Categoria,Ingrediente, Tamaño
 from django.utils.timezone import now
-
+from paypal.standard.forms import PayPalPaymentsForm
 from django.shortcuts import render, get_object_or_404
 from .models import Categoria, Producto, Ingrediente, Tamaño
 
 from django.shortcuts import render, get_object_or_404
 from decimal import Decimal
+
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
+from .models import Categoria, Producto, Ingrediente, Tamaño
 
 def productos(request):
     categorias = Categoria.objects.all()
@@ -21,6 +25,7 @@ def productos(request):
     ingredientes_adicionales = Ingrediente.objects.all()
     tamaños_disponibles = Tamaño.objects.all()
     total_calculado = None
+    carrito = request.session.get('carrito', {})
 
     # Filtrar productos por categoría
     if categoria_seleccionada:
@@ -33,25 +38,46 @@ def productos(request):
         producto_detalle = get_object_or_404(Producto, id_producto=producto_id)
 
     # Procesar el formulario de pedido
-    if request.method == 'POST':
+    if request.method == 'POST' and producto_detalle:
         tamaño_id = request.POST.get('tamaño')
         ingredientes_ids = request.POST.getlist('ingredientes')
         cantidad = int(request.POST.get('cantidad', 1))
 
-        tamaño_obj = Tamaño.objects.get(id=tamaño_id) if tamaño_id else None
+        # Obtener objetos relacionados
+        tamaño_obj = Tamaño.objects.filter(id=tamaño_id).first()
         ingredientes_objs = Ingrediente.objects.filter(id__in=ingredientes_ids)
 
-        # Inicializamos el precio base sin ajuste
         precio_base = producto_detalle.precio
-
-        # Si se seleccionó un tamaño, solo sumamos el precio adicional del tamaño
-        if tamaño_obj:
-            precio_base = 0  # No sumamos el precio base del producto, solo el precio adicional del tamaño
-            precio_base += tamaño_obj.precio_adicional  # Solo agregamos el precio adicional del tamaño
-
-        # Calcular el precio total con ingredientes adicionales y cantidad
+        precio_tamaño = tamaño_obj.precio_adicional if tamaño_obj else 0
         precio_ingredientes = sum(ingrediente.precio_adicional for ingrediente in ingredientes_objs)
-        total_calculado = (precio_base + precio_ingredientes) * cantidad
+        total_calculado = 0
+
+        # Calcular el precio total según la categoría
+        if producto_detalle.categoria.nombre_categoria in ["Panaderia", "Reposteria"]:
+            precio_total = precio_base + precio_tamaño + precio_ingredientes
+        else:
+            precio_total = precio_tamaño + precio_ingredientes
+
+        total_calculado = precio_total * cantidad
+
+        # Agregar al carrito
+        producto_id = str(producto_detalle.id_producto)
+        if 'agregar_carrito' in request.POST:
+            if producto_id not in carrito:
+                carrito[producto_id] = {
+                    'nombre': producto_detalle.nombre_producto,
+                    'cantidad': cantidad,
+                    'tamaño': tamaño_obj.nombre if tamaño_obj else "Base",
+                    'ingredientes': [ingrediente.nombre for ingrediente in ingredientes_objs],
+                    'total': total_calculado,
+                }
+            else:
+                carrito[producto_id]['cantidad'] += cantidad
+                carrito[producto_id]['total'] += total_calculado
+
+            request.session['carrito'] = carrito
+            messages.success(request, f"{producto_detalle.nombre_producto} agregado al carrito.")
+            return redirect('productos')
 
     return render(request, 'nuevo.html', {
         'productos': productos,
@@ -71,15 +97,25 @@ def calcular_total_carrito(carrito):
 def guardar_detalles_pedido(pedido, carrito):
     for key, item in carrito.items():
         producto = Producto.objects.get(pk=key)
-        DetallePedido.objects.create(
+        tamaño_obj = Tamaño.objects.filter(nombre=item['tamaño']).first()
+        ingredientes_objs = Ingrediente.objects.filter(nombre__in=item['ingredientes'])
+
+        # Crear el detalle del pedido
+        detalle_pedido = DetallePedido.objects.create(
             pedido=pedido,
             producto=producto,
             cantidad=item['cantidad'],
-            precio_unitario=producto.precio,  # Validación de precios desde el backend
-            subtotal=producto.precio * item['cantidad']  # Cálculo seguro del subtotal
+            precio_unitario=float(item['precio']),  # Asegúrate de que el precio base se esté tomando correctamente
+            subtotal=float(item['subtotal']),  # Este es el subtotal calculado previamente en el carrito
+            tamaño=tamaño_obj,  # Asignar el tamaño al detalle del pedido
         )
 
-# Vista para ver el carrito
+        # Aquí puedes guardar las relaciones con ingredientes
+        detalle_pedido.ingredientes.set(ingredientes_objs)  # Guardar los ingredientes en el detalle del pedido
+        
+        detalle_pedido.save()
+
+
 def ver_carrito(request):
     carrito = request.session.get('carrito', {})
     total = calcular_total_carrito(carrito)
@@ -140,6 +176,8 @@ def ver_carrito(request):
         'sucursales': sucursales,
     })
 
+
+
 def guardar_pedido(request):
     # Recuperar el carrito de la sesión
     carrito = request.session.get('carrito', {})
@@ -183,16 +221,24 @@ def guardar_pedido(request):
                     estado='Pendiente',  # Cambia según sea necesario
                 )
 
-                # Crear los detalles del pedido
+                # Crear los detalles del pedido con ingredientes y tamaño
                 for key, item in carrito.items():
                     producto = get_object_or_404(Producto, pk=key)
-                    DetallePedido.objects.create(
+                    tamaño_obj = Tamaño.objects.filter(nombre=item['tamaño']).first()
+                    ingredientes_objs = Ingrediente.objects.filter(nombre__in=item['ingredientes'])
+
+                    # Crear el detalle del pedido
+                    detalle_pedido = DetallePedido.objects.create(
                         pedido=pedido,
                         producto=producto,
                         cantidad=item['cantidad'],
                         precio_unitario=float(item['precio']),
                         subtotal=float(item['subtotal']),
+                        tamaño=tamaño_obj,  # Asignar el tamaño al detalle del pedido
                     )
+
+                    # Aquí puedes guardar las relaciones con ingredientes
+                    detalle_pedido.ingredientes.set(ingredientes_objs)  # Guardar los ingredientes en el detalle del pedido
 
                 # Limpiar el carrito
                 request.session['carrito'] = {}
@@ -209,77 +255,8 @@ def guardar_pedido(request):
         'sucursales': sucursales,
         'cliente': cliente,
     })
-def ver_carrito(request):
-    carrito = request.session.get('carrito', {})
-    total = sum(float(item['subtotal']) for item in carrito.values())
 
-    cliente_id = request.session.get('cliente_id')
-    cliente = None
 
-    if cliente_id:
-        cliente = Cliente.objects.filter(id_cliente=cliente_id).first()
-        if not cliente:
-            messages.error(request, "El cliente no existe. Por favor, regístrate o inicia sesión.")
-            return redirect('login1')
-    else:
-        messages.error(request, "Debes iniciar sesión para realizar un pedido.")
-        return redirect('login1')
-
-    sucursales = Sucursal.objects.all()
-
-    if request.method == 'POST':
-        pedido_form = PedidoForm(request.POST)
-
-        if pedido_form.is_valid():
-            try:
-                with transaction.atomic():
-                    pedido = pedido_form.save(commit=False)
-                    pedido.cliente = cliente
-                    pedido.total = total
-
-                    sucursal_id = request.POST.get('sucursal')
-                    if sucursal_id:
-                        sucursal = get_object_or_404(Sucursal, id_sucursal=sucursal_id)
-                        pedido.sucursal = sucursal
-
-                    pedido.save()
-
-                    # Guardar detalles del carrito como objetos DetallePedido
-                    for key, item in carrito.items():
-                        producto = get_object_or_404(Producto, id_producto=key)
-                        DetallePedido.objects.create(
-                            pedido=pedido,
-                            producto=producto,
-                            cantidad=item['cantidad'],
-                            precio_unitario=float(item['precio']),
-                            subtotal=float(item['subtotal']),
-                        )
-
-                    # Limpiar el carrito
-                    request.session['carrito'] = {}
-                    messages.success(request, "Pedido realizado con éxito.")
-                    return redirect('mostrar_productos')
-
-            except Exception as e:
-                messages.error(request, f"Error al guardar el pedido: {str(e)}")
-        else:
-            print(pedido_form.errors)
-            messages.error(request, "Error en los datos del formulario. Por favor, verifica los campos.")
-    else:
-        initial_data = {
-            'direccion_envio': cliente.direccion if cliente else '',
-            'email': cliente.email if cliente else '',
-        }
-        pedido_form = PedidoForm(initial=initial_data)
-
-    return render(request, 'carrito.html', {
-        'carrito': carrito,
-        'total': total,
-        'pedido_form': pedido_form,
-        'sucursales': sucursales,
-    })
-
-# Vista para agregar un producto al carrito
 def agregar_al_carrito(request, id_producto):
     producto = get_object_or_404(Producto, id_producto=id_producto)
     
@@ -318,6 +295,8 @@ def agregar_al_carrito(request, id_producto):
             'precio': str(precio_base + precio_ingredientes + precio_tamaño),
             'cantidad': cantidad,
             'subtotal': str(total_producto),
+            'tamaño': tamaño_obj.nombre if tamaño_obj else "Base",  # Añadir nombre del tamaño
+            'ingredientes': [ingrediente.nombre for ingrediente in ingredientes_objs]  # Añadir nombres de ingredientes
         }
 
     request.session['carrito'] = carrito
@@ -522,7 +501,13 @@ def registrar_administrador(request):
 
 
 def pedidos(request):
-    # Obtener todos los pedidos junto con sus detalles
-    pedidos = Pedido.objects.all().prefetch_related('detalles')
-    
+    # Obtener todos los pedidos junto con sus detalles y relaciones necesarias
+    pedidos = Pedido.objects.prefetch_related(
+        'detalles__producto',        # Cargar los productos de cada detalle
+        'detalles__ingredientes',   # Cargar los ingredientes de cada detalle
+        'detalles__tamaño'          # Cargar el tamaño de cada detalle
+    ).all()
+
     return render(request, 'pedidos.html', {'pedidos': pedidos})
+
+    

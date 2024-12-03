@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'panaderia',
     'widget_tweaks',
+    'paypal.standard.ipn',
 ]
 
 MIDDLEWARE = [
@@ -146,3 +147,5 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'  # O 'bootstrap5' si prefieres
 LANGUAGE_CODE = 'es'
+PAYPAL_RECEIVER_EMAIL = 'pchehuin@gmail.com' # where cash is paid into
+PAYPAL_TEST = True

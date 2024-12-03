@@ -25,6 +25,7 @@ urlpatterns = [
     path('', include('panaderia.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
     path('salir/', views.salir, name='salir'),
+    path('', include('paypal.standard.ipn.urls')),
 
 
 ]

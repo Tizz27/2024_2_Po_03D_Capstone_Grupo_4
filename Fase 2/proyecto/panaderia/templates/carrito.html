@@ -20,7 +20,8 @@
                                     <th>Producto</th>
                                     <th>Precio</th>
                                     <th>Cantidad</th>
-                                    <th>Subtotal</th>
+                                    <th>Tamaño</th>
+                                    
                                     <th>Acciones</th>
                                 </tr>
                             </thead>
@@ -30,7 +31,11 @@
                                     <td>{{ item.nombre }}</td>
                                     <td>${{ item.precio|floatformat:0 }}</td>
                                     <td>{{ item.cantidad }}</td>
-                                    <td>${{ item.subtotal|floatformat:0 }}</td>
+                                    
+                                    <td>${{ item.subtotal }}</td>
+                                    </td>
+                                    
+                                    
                                     <td>
                                         <a href="{% url 'eliminar_del_carrito' key %}" class="btn btn-danger btn-sm">Eliminar</a>
                                     </td>
