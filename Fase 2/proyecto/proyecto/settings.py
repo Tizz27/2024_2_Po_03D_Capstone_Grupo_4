@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'panaderia',
     'widget_tweaks',
     'paypal.standard.ipn',
+     'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -63,6 +64,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
     
 ]
 
@@ -147,5 +149,10 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'  # O 'bootstrap5' si prefieres
 LANGUAGE_CODE = 'es'
-PAYPAL_RECEIVER_EMAIL = 'pchehuin@gmail.com' # where cash is paid into
-PAYPAL_TEST = True
+# settings.py
+PAYPAL_CLIENT_ID = "AdfVH8Oaig0DwX4E6GHxgwjzEf2WxEmxk8c4dqJgiSku9PYz4WjEEhlJeCHET9t-PyPirSs-8pX9Hdr2"
+PAYPAL_SECRET = "EGZi8SH-5VhukXCaXWPljs0ZITEuDQC9O_qK_M90sWCWWcWkNbMqPny6t2bWYSY6OU7lrLXFgPHkI3aL"
+PAYPAL_ENV = "sandbox"  # Usa "live" para el entorno de producción
+
+
+

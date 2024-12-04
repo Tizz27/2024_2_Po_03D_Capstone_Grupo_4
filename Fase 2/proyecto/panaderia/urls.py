@@ -1,5 +1,5 @@
-from django.urls import path
-from .views import gestion, modificar,listar_clientes,productos,pedidos,registrar_administrador,eliminar_cliente,eliminar,registrar_producto,base,guardar_pedido, mostrar_productos,registrar_cliente, salir, login_view,home,cerrar,agregar_al_carrito,ver_carrito,eliminar_del_carrito,contacto
+from django.urls import path,include
+from .views import gestion, modificar,procesar_pago,pago_exitoso,pago_cancelado,listar_clientes,productos,pedidos,registrar_administrador,eliminar_cliente,eliminar,registrar_producto,base,guardar_pedido, mostrar_productos,registrar_cliente, salir, login_view,home,cerrar,agregar_al_carrito,ver_carrito,eliminar_del_carrito,contacto
 
 urlpatterns =[
     path('', base, name='base'),
@@ -24,6 +24,11 @@ urlpatterns =[
     path('pedidos/', pedidos, name='pedidos'),
     path('productos/<str:categoria>/', productos, name='productos_categoria'),
     path('nuevo/', productos, name='productos_todos'),
+    path('pago_exitoso/', pago_exitoso, name='pago_exitoso'),
+    path('pago_cancelado/', pago_cancelado, name='pago_cancelado'),
+    path('procesar_pago/', procesar_pago, name='procesar_pago'),
+	
+    
     
     
     

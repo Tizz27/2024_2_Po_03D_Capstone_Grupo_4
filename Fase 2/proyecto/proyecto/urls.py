@@ -17,6 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from panaderia import views
+
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -25,7 +26,10 @@ urlpatterns = [
     path('', include('panaderia.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
     path('salir/', views.salir, name='salir'),
-    path('', include('paypal.standard.ipn.urls')),
+   
+    
+    
+    
 
 
 ]

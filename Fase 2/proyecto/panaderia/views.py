@@ -8,14 +8,87 @@ from .models import Producto, Pedido, DetallePedido, Sucursal, Cliente,Categoria
 from django.utils.timezone import now
 from paypal.standard.forms import PayPalPaymentsForm
 from django.shortcuts import render, get_object_or_404
-from .models import Categoria, Producto, Ingrediente, Tamaño
 
-from django.shortcuts import render, get_object_or_404
-from decimal import Decimal
+from paypal.standard.forms import PayPalPaymentsForm
 
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib import messages
-from .models import Categoria, Producto, Ingrediente, Tamaño
+import requests
+from django.http import JsonResponse
+from .paypal_service import get_paypal_access_token
+
+
+def procesar_pago(request):
+    if request.method == "POST":
+        total = request.POST.get("total")
+        
+        # Crear el pago en PayPal
+        access_token = get_paypal_access_token()  # Usar la función que definimos antes
+
+        url = "https://api.sandbox.paypal.com/v2/checkout/orders"
+        headers = {
+            "Authorization": f"Bearer {access_token}",
+            "Content-Type": "application/json"
+        }
+        payload = {
+            "intent": "CAPTURE",
+            "purchase_units": [{
+                "amount": {
+                    "currency_code": "USD",
+                    "value": str(total).replace(",", ".")
+                }
+            }],
+            "application_context": {
+                "return_url": request.build_absolute_uri('/pago_exitoso/'),
+                "cancel_url": request.build_absolute_uri('/pago_cancelado/')
+            }
+        }
+
+        print("Payload:", payload)  # Esto ayudará a asegurarse de que los datos estén bien estructurados
+
+        response = requests.post(url, json=payload, headers=headers)
+
+        if response.status_code == 201:
+            approval_url = next(link['href'] for link in response.json()['links'] if link['rel'] == 'approve')
+            return redirect(approval_url)
+        else:
+            # Imprimir el cuerpo de la respuesta para diagnóstico
+            error_details = response.json()  # Ver los detalles del error
+            return JsonResponse({"error": "Error al crear el pago en PayPal", "details": error_details})
+        
+def pago_exitoso(request):
+    # Obtener parámetros de la URL
+    payer_id = request.GET.get("PayerID")
+    token = request.GET.get("token")  # Este token debe ser el ID de la orden de PayPal
+
+    if not token or not payer_id:
+        return JsonResponse({"error": "Faltan parámetros en la respuesta de PayPal."})
+
+    try:
+        access_token = get_paypal_access_token()
+        url = f"https://api.sandbox.paypal.com/v2/checkout/orders/{token}/capture"
+        headers = {
+            "Authorization": f"Bearer {access_token}",
+            "Content-Type": "application/json"
+        }
+
+        # Realizar solicitud a PayPal
+        response = requests.post(url, headers=headers)
+
+        if response.status_code == 201 or response.status_code == 200:
+            # El pago se ha completado con éxito
+            print("Pago capturado exitosamente:", response.json())
+            return render(request, 'pago_exitoso.html')
+        else:
+            # Mostrar el error detallado
+            print("Error al capturar el pago:", response.json())
+            return JsonResponse({"error": "Error al capturar el pago", "details": response.json()})
+    except Exception as e:
+        print("Excepción capturada:", str(e))
+        return JsonResponse({"error": "Error interno al procesar el pago.", "details": str(e)})   
+
+    
+def pago_cancelado(request):
+    # El usuario ha cancelado el pago
+    return render(request, 'pago_cancelado.html')
 
 def productos(request):
     categorias = Categoria.objects.all()
@@ -175,7 +248,6 @@ def ver_carrito(request):
         'pedido_form': pedido_form,
         'sucursales': sucursales,
     })
-
 
 
 def guardar_pedido(request):
@@ -510,4 +582,4 @@ def pedidos(request):
 
     return render(request, 'pedidos.html', {'pedidos': pedidos})
 
-    
+
